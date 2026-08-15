@@ -1,0 +1,303 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+
+<head>
+
+  <meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+<title>مواقيت الولاء </title>
+
+<!-- Favicon -->
+<link rel="icon" type="image/png" href="favicon.png">
+
+<!-- Google Font -->
+<link href="https://fonts.googleapis.com/css2?family=Cairo:wght@300;400;600;700&display=swap" rel="stylesheet">
+
+<!-- Font Awesome -->
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.7.2/css/all.min.css">
+
+<!-- CSS -->
+<link rel="stylesheet" href="css/style.css">
+
+
+</head>
+
+
+
+<body>
+
+
+    <!-- ================= HEADER ================= -->
+
+
+    <header>
+
+
+        <h1>
+
+            <i class="fa-solid fa-calendar-days"></i>
+
+            مواقيت الولاء للمناسبات الدينية 
+        </h1>
+
+
+
+      <div class="top-buttons">
+
+    <button id="aboutBtn">
+    <i class="fa-solid fa-circle-info"></i>
+    حول التطبيق
+</button>
+
+    <button id="darkModeBtn">
+
+        <i class="fa-solid fa-moon"></i>
+
+        الوضع الليلي
+
+    </button>
+
+</div>
+
+
+    </header>
+
+
+
+
+
+    <!-- ================= MAIN ================= -->
+
+
+    <main>
+
+
+
+        <!-- Sidebar -->
+
+
+        <aside>
+
+            <h2>المناسبات📅</h2>
+
+        
+            <div class="events-panel">
+
+
+
+                <div id="month-events-list"></div>
+
+            </div>
+
+        </aside>
+
+
+
+
+
+        <!-- ================= CALENDAR ================= -->
+
+
+        <section class="calendar">
+
+
+
+            <div id="calendarHeader" class="calendar-header">
+
+                <button class="nav-btn" onclick="previousMonth()">
+                    ▶
+                </button>
+
+                <div class="header-center">
+
+                    <h2 id="monthYear"></h2>
+
+                    <div class="today-info">
+
+                        <span id="todayGregorian"></span>
+
+                        <span id="todayHijri"></span>
+
+                    </div>
+
+                </div>
+
+                <button class="nav-btn" onclick="nextMonth()">
+                    ◀
+                </button>
+
+            </div>
+
+
+
+
+
+            <div id="calendar" class="calendar-grid">
+
+            </div>
+
+
+
+        </section>
+
+
+
+    </main>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+    
+
+
+    <!-- ================= DAY DETAILS ================= -->
+
+
+    <div id="detailsModal" class="modal">
+
+
+        <div class="modal-content">
+
+
+            <span id="closeDetails">
+
+                &times;
+
+            </span>
+
+
+
+            <h2>
+
+                تفاصيل اليوم
+
+            </h2>
+
+
+
+            <div id="detailsContent">
+
+            </div>
+
+
+
+        </div>
+
+
+    </div>
+
+
+
+<!-- ================= ABOUT MODAL ================= -->
+
+
+<!-- ================= ABOUT APP ================= -->
+
+<div id="aboutModal" class="modal">
+
+    <div class="modal-content about-content">
+
+        <span id="closeAbout">
+            &times;
+        </span>
+
+        <h2>
+            <i class="fa-solid fa-circle-info"></i>
+            حول التطبيق
+        </h2>
+
+        <div class="about-body">
+
+            <h3>
+                التقويم الميلادي والهجري لأهل البيت عليهم السلام
+            </h3>
+
+            <p>
+                تطبيق لعرض التاريخ الميلادي والهجري
+                مع المناسبات الدينية.
+            </p>
+
+            <p>
+                يساعد التطبيق على متابعة التواريخ والمناسبات
+                المهمة بطريقة بسيطة ومنظمة.
+            </p>
+
+            <div class="about-features">
+
+                <div>
+                    <i class="fa-solid fa-calendar"></i>
+                    <span>التقويم الميلادي</span>
+                </div>
+
+                <div>
+                    <i class="fa-solid fa-moon"></i>
+                    <span>التقويم الهجري</span>
+                </div>
+
+                <div>
+                    <i class="fa-solid fa-star"></i>
+                    <span>مناسبات أهل البيت عليهم السلام</span>
+                </div>
+
+                <div>
+                    <i class="fa-solid fa-circle-check"></i>
+                    <span>تفاصيل الأيام</span>
+                </div>
+
+            </div>
+
+            <div class="about-footer">
+
+                <span>الإصدار 1.0</span>
+
+                <span>© 2026</span>
+
+                <span>*نور البرمجة*</span>
+
+                <span>LP</span>
+
+            </div>
+
+        </div>
+
+    </div>
+    </div>
+
+
+
+
+    <!-- ================= JAVASCRIPT ================= -->
+
+<!-- ================= JAVASCRIPT ================= -->
+
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+
+<script src="js/supabase-config.js"></script>
+<script src="js/supabase-client.js"></script>
+
+<script src="js/hijri-events.js" defer></script>
+<script src="js/sidebar.js" defer></script>
+
+<script src="js/events.js" defer></script>
+<script src="js/modal.js" defer></script>
+<script src="js/details.js" defer></script>
+<script src="js/hijri.js" defer></script>
+<script src="js/hijri-settings.js" defer></script>
+<script src="js/calendar.js" defer></script>
+
+
+
+</body>
+
+</html>
