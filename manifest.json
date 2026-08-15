@@ -6,6 +6,7 @@
   "dir": "rtl",
   "start_url": "./index.html",
   "scope": "./",
+  "id": "/MawaqitAlWalaa/index.html",
   "display": "standalone",
   "background_color": "#064635",
   "theme_color": "#064635",
