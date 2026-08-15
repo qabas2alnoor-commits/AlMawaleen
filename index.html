@@ -297,7 +297,26 @@
 <script src="js/hijri.js" defer></script>
 <script src="js/hijri-settings.js" defer></script>
 <script src="js/calendar.js" defer></script>
-
+<script>
+  if ("serviceWorker" in navigator) {
+    window.addEventListener("load", () => {
+      navigator.serviceWorker
+        .register("./service-worker.js")
+        .then((registration) => {
+          console.log(
+            "Service Worker registered:",
+            registration.scope
+          );
+        })
+        .catch((error) => {
+          console.error(
+            "Service Worker registration failed:",
+            error
+          );
+        });
+    });
+  }
+</script>
 
 
 </body>
