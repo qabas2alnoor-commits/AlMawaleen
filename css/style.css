@@ -1,11 +1,12 @@
 /* =========================================================
-مواقيت الولاء - Final Clean Style.css
-Dark Green + Gold Theme
-========================================================= */
+   مواقيت الولاء
+   Final Responsive Layout
+   ========================================================= */
+
 
 /* =========================================================
-1. Color System
-========================================================= */
+   1. COLORS
+   ========================================================= */
 
 :root {
     --green-dark: #064E3B;
@@ -32,231 +33,379 @@ Dark Green + Gold Theme
     --success-light: #E2F3E7;
 }
 
+
 /* =========================================================
-2. General
-========================================================= */
+   2. GENERAL
+   ========================================================= */
 
 * {
     box-sizing: border-box;
 }
 
+html,
+body {
+    width: 100%;
+    min-width: 0;
+}
+
 body {
     margin: 0;
+
     font-family: 'Cairo', sans-serif;
+
     direction: rtl;
+
     background: var(--cream);
+
     color: var(--text);
+
+    overflow-x: hidden;
+}
+
+button,
+input,
+select {
+    font-family: 'Cairo', sans-serif;
 }
 
 button {
     border: none;
     cursor: pointer;
-    font-family: 'Cairo', sans-serif;
 }
 
+
 /* =========================================================
-3. Header
-========================================================= */
+   3. HEADER
+   ========================================================= */
 
 header {
-    background: var(--green-dark);
-    padding: 25px 35px;
+    width: 100%;
+
+    min-height: 68px;
+
+    padding: 12px 24px;
 
     display: flex;
-    justify-content: space-between;
+
     align-items: center;
 
-    box-shadow: 0 4px 15px rgba(6, 78, 59, 0.25);
+    justify-content: space-between;
+
+    gap: 20px;
+
+    background: var(--green-dark);
+
     border-bottom: 3px solid var(--gold);
+
+    box-shadow: 0 4px 15px rgba(6, 78, 59, 0.25);
 }
 
 header h1 {
     margin: 0;
+
     color: var(--gold-light);
-    font-size: 35px;
+
+    font-size: 27px;
+
+    line-height: 1.3;
+
+    white-space: nowrap;
 }
 
 header h1 i {
     color: var(--gold);
-    margin-left: 8px;
+
+    margin-left: 7px;
 }
+
+
+/* =========================================================
+   4. TOP BUTTONS
+   ========================================================= */
 
 .top-buttons {
     display: flex;
-    gap: 15px;
+
+    align-items: center;
+
+    gap: 8px;
+
+    flex-wrap: wrap;
 }
 
 .top-buttons button {
+    padding: 8px 14px;
+
     background: var(--green);
+
     color: white;
 
-    padding: 12px 22px;
+    font-size: 14px;
 
-    border-radius: 10px;
-    font-size: 16px;
+    border-radius: 9px;
 
     border: 1px solid rgba(232, 199, 102, 0.35);
 
-    transition: 0.3s;
+    transition: 0.25s;
 }
 
 .top-buttons button:hover {
     background: var(--gold);
+
     color: var(--green-deep);
 
-    transform: translateY(-2px);
-
-    box-shadow: 0 5px 15px rgba(212, 175, 55, 0.25);
+    transform: translateY(-1px);
 }
 
+
 /* =========================================================
-4. Main Layout
-========================================================= */
+   5. MAIN LAYOUT
+   ========================================================= */
 
 main {
+    width: 100%;
+
+    max-width: 1380px;
+
+    margin: 0 auto;
+
+    padding: 15px 18px;
+
     display: grid;
 
-    grid-template-columns: 320px 1fr;
+    grid-template-columns: 270px minmax(0, 1fr);
 
-    gap: 25px;
+    gap: 16px;
 
-    padding: 25px;
+    align-items: start;
 }
 
+
 /* =========================================================
-5. Sidebar
-========================================================= */
+   6. SIDEBAR
+   ========================================================= */
 
 aside {
+    width: 100%;
+
+    min-width: 0;
+
     background: var(--white);
 
-    padding: 20px;
+    padding: 14px;
 
-    border-radius: 20px;
+    border-radius: 14px;
 
     border-top: 4px solid var(--gold);
 
     box-shadow: 0 5px 20px rgba(6, 78, 59, 0.10);
+
+    max-height: calc(100vh - 100px);
+
+    overflow: hidden;
+
+    position: sticky;
+
+    top: 12px;
 }
 
 aside h2 {
-    margin-top: 0;
+    margin: 0 0 10px;
+
     color: var(--green-dark);
+
+    font-size: 20px;
+
+    line-height: 1.4;
 }
 
-aside input {
-    width: 100%;
-
-    padding: 12px;
-
-    border-radius: 10px;
-
-    border: 1px solid var(--border);
-}
 
 /* =========================================================
-6. Events
-========================================================= */
+   7. EVENTS PANEL
+   ========================================================= */
+
+.events-panel {
+    width: 100%;
+
+    min-width: 0;
+
+    max-height: calc(100vh - 165px);
+
+    overflow-y: auto;
+
+    overflow-x: hidden;
+
+    padding-left: 3px;
+
+    scrollbar-width: thin;
+}
+
+
+/* =========================================================
+   8. REAL EVENTS CONTAINER
+   ========================================================= */
+
+#month-events-list {
+    width: 100%;
+
+    min-width: 0;
+}
+
+
+/* =========================================================
+   9. EVENTS
+   ========================================================= */
 
 .event {
-    display: flex;
+    width: 100%;
 
-    gap: 10px;
+    display: flex;
 
     align-items: center;
 
-    padding: 10px;
+    gap: 8px;
 
-    margin-bottom: 8px;
+    padding: 8px;
 
-    border-radius: 10px;
+    margin-bottom: 6px;
+
+    border-radius: 9px;
 
     background: #F4F7F5;
+
+    line-height: 1.6;
+
+    overflow: hidden;
 }
 
 .event-icon {
-    font-size: 22px;
+    font-size: 20px;
+
+    flex-shrink: 0;
 }
+
 
 /* Birth */
 
 .birth {
     background: var(--success-light);
+
     color: var(--success);
 
     border-right: 4px solid var(--success);
 }
 
+
 /* Death */
 
 .death {
     background: var(--danger-light);
+
     color: var(--danger);
 
     border-right: 4px solid var(--danger);
 }
 
+
 /* Martyr */
 
 .martyr {
     background: #FFE0E0;
+
     color: #A51D1D;
 
     border-right: 4px solid #A51D1D;
 }
-/* =================================
-   عطلة رسمية في قائمة المناسبات
-   ================================= */
+
+
+/* =========================================================
+   10. SIDEBAR EVENT ROW
+   ========================================================= */
 
 .sidebar-event-row {
-    display: flex;
-    align-items: center;
-    flex-wrap: wrap;
-    gap: 6px;
     width: 100%;
+
+    display: flex;
+
+    align-items: center;
+
+    flex-wrap: wrap;
+
+    gap: 4px;
+
+    font-size: 13px;
+
+    line-height: 1.6;
 }
 
 .sidebar-event-day {
     font-weight: bold;
+
     white-space: nowrap;
 }
 
 .sidebar-event-title {
     flex: 1;
+
+    min-width: 0;
+
+    overflow-wrap: anywhere;
 }
 
 .sidebar-holiday {
-    display: inline-block;
-    color: #C62828 !important;
+    color: var(--danger) !important;
+
     font-weight: bold;
-    font-size: 12px;
+
+    font-size: 10px;
+
     white-space: nowrap;
+
     flex-shrink: 0;
 }
 
+
 /* =========================================================
-7. Calendar Box
-========================================================= */
+   11. CALENDAR
+   ========================================================= */
 
 .calendar {
+    width: 100%;
+
+    min-width: 0;
+
     background: var(--white);
 
-    padding: 25px;
+    padding: 15px;
 
-    border-radius: 20px;
+    border-radius: 14px;
 
     box-shadow: 0 5px 20px rgba(6, 78, 59, 0.10);
+
+    overflow: hidden;
 }
 
+
 /* =========================================================
-8. Calendar Header
-========================================================= */
+   12. CALENDAR HEADER
+   ========================================================= */
 
 .calendar-header {
+    width: 100%;
+
+    min-width: 0;
+
     display: flex;
 
-    justify-content: space-between;
     align-items: center;
+
+    justify-content: space-between;
+
+    gap: 10px;
+
+    padding: 11px 15px;
+
+    margin-bottom: 13px;
 
     background: linear-gradient(
         135deg,
@@ -264,51 +413,60 @@ aside input {
         var(--green)
     );
 
-    color: white;
-
-    padding: 20px;
-
-    border-radius: 18px;
-
-    margin-bottom: 20px;
+    border-radius: 12px;
 
     border-bottom: 3px solid var(--gold);
 
-    box-shadow: 0 5px 15px rgba(6, 78, 59, 0.20);
+    color: white;
 }
 
 .header-center {
     flex: 1;
+
+    min-width: 0;
+
     text-align: center;
 }
 
 .calendar-header h2 {
-    font-size: 32px;
     margin: 0;
 
     color: var(--gold-light);
+
+    font-size: 24px;
+
+    line-height: 1.3;
+
+    white-space: nowrap;
 }
 
 .today-info {
-    margin-top: 8px;
+    margin-top: 3px;
 
     display: flex;
+
     flex-direction: column;
 
-    gap: 4px;
+    gap: 1px;
 
-    font-size: 25px;
+    font-size: 16px;
+
+    line-height: 1.4;
 
     color: #F8F5EA;
 }
 
+
 /* =========================================================
-9. Navigation Buttons
-========================================================= */
+   13. NAVIGATION
+   ========================================================= */
 
 .nav-btn {
-    width: 45px;
-    height: 45px;
+    width: 37px;
+
+    height: 37px;
+
+    flex-shrink: 0;
 
     border-radius: 50%;
 
@@ -316,11 +474,11 @@ aside input {
 
     color: var(--gold-light);
 
-    font-size: 20px;
+    font-size: 16px;
 
     border: 1px solid rgba(232, 199, 102, 0.45);
 
-    transition: 0.3s;
+    transition: 0.25s;
 }
 
 .nav-btn:hover {
@@ -331,76 +489,83 @@ aside input {
     transform: scale(1.05);
 }
 
+
 /* =========================================================
-10. Calendar Grid
-========================================================= */
+   14. CALENDAR GRID
+   ========================================================= */
 
 #calendar,
 .calendar-grid {
+    width: 100%;
+
+    min-width: 0;
+
     display: grid;
 
     grid-template-columns: repeat(7, minmax(0, 1fr));
 
-    gap: 6px;
-
-    align-items: stretch;
+    gap: 4px;
 
     direction: rtl;
 }
 
+
 /* =========================================================
-11. Day Names
-========================================================= */
+   15. DAY NAMES
+   ========================================================= */
 
 .day-name {
+    padding: 7px 4px;
+
     background: var(--green-dark);
 
     color: var(--gold-light);
 
-    padding: 12px;
+    border-radius: 7px;
 
-    border-radius: 10px;
+    border-bottom: 2px solid var(--gold);
 
     text-align: center;
 
+    font-size: 12px;
+
     font-weight: bold;
 
-    direction: rtl;
-
-    border-bottom: 2px solid var(--gold);
+    line-height: 1.3;
 }
 
+
 /* =========================================================
-12. Empty Cells
-========================================================= */
+   16. EMPTY DAYS
+   ========================================================= */
 
 #calendar .empty,
 .calendar-grid .empty {
-    min-height: 105px;
-    height: 105px;
+    height: 80px;
 
-    box-sizing: border-box;
+    min-height: 80px;
 
     border: 1px solid rgba(0, 80, 60, 0.06);
 
-    border-radius: 8px;
+    border-radius: 7px;
 }
 
+
 /* =========================================================
-13. Calendar Day Cell
-========================================================= */
+   17. CALENDAR DAY
+   ========================================================= */
 
 #calendar .day,
 .calendar-grid .day,
 .calendar-day {
-    min-height: 105px;
-    height: 105px;
+    height: 80px;
 
-    box-sizing: border-box;
+    min-height: 80px;
 
-    padding: 7px 5px;
+    padding: 5px 4px;
 
     display: flex;
+
     flex-direction: column;
 
     align-items: stretch;
@@ -415,18 +580,12 @@ aside input {
 
     border: 1px solid rgba(0, 80, 60, 0.12);
 
-    border-radius: 8px;
+    border-radius: 7px;
 
     direction: rtl;
 
-    transition:
-        background 0.15s ease,
-        border-color 0.15s ease,
-        transform 0.15s ease,
-        box-shadow 0.15s ease;
+    transition: 0.15s;
 }
-
-/* Hover */
 
 #calendar .day:hover,
 .calendar-grid .day:hover,
@@ -436,34 +595,18 @@ aside input {
     border-color: rgba(212, 175, 55, 0.45);
 
     transform: translateY(-1px);
-
-    box-shadow: 0 4px 10px rgba(6, 78, 59, 0.08);
 }
 
+
 /* =========================================================
-14. Gregorian Number
-========================================================= */
+   18. GREGORIAN
+   ========================================================= */
 
 #calendar .day .gregorian-day,
-.calendar-day .gregorian-day {
-    font-size: 18px;
-
-    font-weight: 700;
-
-    line-height: 1.2;
-
-    text-align: center;
-
-    margin-bottom: 3px;
-
-    color: var(--green-dark);
-}
-
-/* دعم الكلاس القديم */
-
+.calendar-day .gregorian-day,
 #calendar .day .gregorian,
 .calendar-day .gregorian {
-    font-size: 18px;
+    font-size: 15px;
 
     font-weight: 700;
 
@@ -471,26 +614,29 @@ aside input {
 
     text-align: center;
 
-    margin-bottom: 3px;
+    margin-bottom: 2px;
 
     color: var(--green-dark);
 }
 
+
 /* =========================================================
-15. Hijri Date
-========================================================= */
+   19. HIJRI
+   ========================================================= */
 
 #calendar .day .hijri-day,
-.calendar-day .hijri-day {
-    font-size: 13px;
+.calendar-day .hijri-day,
+#calendar .day .hijri,
+.calendar-day .hijri {
+    font-size: 11px;
 
     line-height: 1.3;
 
     text-align: center;
 
-    margin-bottom: 4px;
+    margin-bottom: 2px;
 
-    min-height: 18px;
+    min-height: 17px;
 
     white-space: nowrap;
 
@@ -501,24 +647,10 @@ aside input {
     color: var(--muted);
 }
 
-/* دعم الكلاس القديم */
-
-#calendar .day .hijri,
-.calendar-day .hijri {
-    font-size: 13px;
-
-    line-height: 1.3;
-
-    text-align: center;
-
-    margin-bottom: 4px;
-
-    color: var(--muted);
-}
 
 /* =========================================================
-16. Events Inside Day
-========================================================= */
+   20. DAY EVENTS
+   ========================================================= */
 
 #calendar .day .day-events,
 .calendar-day .day-events {
@@ -537,23 +669,22 @@ aside input {
     overflow: hidden;
 }
 
+
 /* =========================================================
-17. Mini Event
-========================================================= */
+   21. MINI EVENTS
+   ========================================================= */
 
 #calendar .day .mini-event,
 .calendar-day .mini-event {
     width: 100%;
 
-    box-sizing: border-box;
+    padding: 1px 2px;
 
-    font-size: 11px;
+    font-size: 9px;
 
-    line-height: 1.3;
+    line-height: 1.25;
 
     text-align: center;
-
-    white-space: normal;
 
     overflow: hidden;
 
@@ -565,14 +696,13 @@ aside input {
 
     overflow-wrap: anywhere;
 
-    word-break: normal;
-
-    padding: 1px 2px;
+    direction: rtl;
 }
 
+
 /* =========================================================
-18. Event Colors Inside Calendar
-========================================================= */
+   22. EVENT COLORS
+   ========================================================= */
 
 .green-day {
     background: linear-gradient(
@@ -600,9 +730,10 @@ aside input {
     border: 2px solid var(--gold) !important;
 }
 
+
 /* =========================================================
-19. Today
-========================================================= */
+   23. TODAY
+   ========================================================= */
 
 #calendar .day.today,
 .calendar-day.today {
@@ -616,7 +747,7 @@ aside input {
 
     border: 3px solid var(--gold);
 
-    box-shadow: 0 8px 20px rgba(6, 78, 59, 0.30);
+    box-shadow: 0 6px 16px rgba(6, 78, 59, 0.25);
 }
 
 #calendar .day.today .gregorian,
@@ -633,30 +764,10 @@ aside input {
     color: #F8F5EA;
 }
 
-#calendar .day.today .mini-event,
-.calendar-day.today .mini-event {
-    color: inherit;
-}
 
 /* =========================================================
-20. Mini Event Direction
-========================================================= */
-
-.mini-event {
-    direction: rtl;
-
-    text-align: center;
-
-    unicode-bidi: plaintext;
-
-    width: 100%;
-
-    display: block;
-}
-
-/* =========================================================
-21. Modal
-========================================================= */
+   24. MODALS
+   ========================================================= */
 
 .modal {
     display: none;
@@ -665,15 +776,15 @@ aside input {
 
     inset: 0;
 
-    background: rgba(4, 60, 46, 0.70);
+    z-index: 1000;
+
+    padding: 20px;
 
     justify-content: center;
 
     align-items: center;
 
-    z-index: 1000;
-
-    padding: 20px;
+    background: rgba(4, 60, 46, 0.70);
 }
 
 .modal.show {
@@ -681,13 +792,13 @@ aside input {
 }
 
 .modal-content {
-    background: var(--white);
-
     width: 400px;
 
     max-width: 100%;
 
     padding: 25px;
+
+    background: var(--white);
 
     border-radius: 20px;
 
@@ -711,13 +822,12 @@ aside input {
     border-radius: 10px;
 
     border: 1px solid var(--border);
-
-    font-family: 'Cairo', sans-serif;
 }
 
+
 /* =========================================================
-22. Modal Close Buttons
-========================================================= */
+   25. MODAL CLOSE
+   ========================================================= */
 
 #closeModal,
 #closeDetails,
@@ -730,7 +840,7 @@ aside input {
 
     color: var(--green-dark);
 
-    transition: 0.3s;
+    transition: 0.25s;
 }
 
 #closeModal:hover,
@@ -741,9 +851,10 @@ aside input {
     transform: scale(1.1);
 }
 
+
 /* =========================================================
-23. Save Button
-========================================================= */
+   26. SAVE
+   ========================================================= */
 
 #saveEvent {
     width: 100%;
@@ -757,8 +868,6 @@ aside input {
     border-radius: 10px;
 
     border: 1px solid var(--gold);
-
-    transition: 0.3s;
 }
 
 #saveEvent:hover {
@@ -767,9 +876,10 @@ aside input {
     color: var(--green-deep);
 }
 
+
 /* =========================================================
-24. Details
-========================================================= */
+   27. DETAILS
+   ========================================================= */
 
 .detail-event {
     display: flex;
@@ -778,249 +888,46 @@ aside input {
 
     align-items: center;
 
-    background: #F2F6F3;
+    gap: 10px;
 
     padding: 15px;
 
-    border-radius: 12px;
-
     margin-bottom: 10px;
+
+    background: #F2F6F3;
+
+    border-radius: 12px;
 
     border-right: 3px solid var(--gold);
 }
 
 .edit-btn {
+    padding: 7px 12px;
+
     background: var(--green);
 
     color: white;
 
-    padding: 7px 12px;
-
     border-radius: 8px;
 }
 
-.edit-btn:hover {
-    background: var(--gold);
-
-    color: var(--green-deep);
-}
-
 .delete-btn {
+    padding: 7px 12px;
+
     background: var(--danger);
 
     color: white;
 
-    padding: 7px 12px;
-
     border-radius: 8px;
 }
 
-/* =========================================================
-25. Monthly Events
-========================================================= */
-
-#monthlyEvents {
-    margin-top: 15px;
-}
-
-#monthlyEvents .event {
-    font-size: 18px;
-
-    line-height: 1.9;
-
-    cursor: pointer;
-
-    transition: 0.3s;
-
-    padding: 12px;
-}
-
-#monthlyEvents .event:hover {
-    transform: translateX(-5px);
-}
-
-#monthlyEvents .event-icon {
-    font-size: 24px;
-}
 
 /* =========================================================
-26. About App
-========================================================= */
-
-.about-modal {
-    position: fixed;
-
-    inset: 0;
-
-    background: rgba(0, 0, 0, 0.55);
-
-    display: none;
-
-    align-items: center;
-
-    justify-content: center;
-
-    z-index: 9999;
-
-    padding: 20px;
-
-    backdrop-filter: blur(5px);
-}
-
-.about-modal.show {
-    display: flex;
-}
-
-.about-box {
-    position: relative;
-
-    width: 100%;
-
-    max-width: 480px;
-
-    background: #fff;
-
-    border-radius: 20px;
-
-    padding: 35px 30px 25px;
-
-    text-align: center;
-
-    box-shadow: 0 20px 60px rgba(0, 0, 0, 0.25);
-
-    border-top: 5px solid var(--gold);
-
-    animation: aboutOpen 0.3s ease;
-}
-
-@keyframes aboutOpen {
-    from {
-        opacity: 0;
-        transform: translateY(-20px) scale(0.95);
-    }
-
-    to {
-        opacity: 1;
-        transform: translateY(0) scale(1);
-    }
-}
-
-/* About Close */
-
-.about-close {
-    position: absolute;
-
-    top: 12px;
-
-    left: 12px;
-
-    width: 35px;
-
-    height: 35px;
-
-    border-radius: 50%;
-
-    background: #F1F4F2;
-
-    color: #075B47;
-
-    font-size: 18px;
-
-    cursor: pointer;
-
-    transition: 0.2s;
-}
-
-.about-close:hover {
-    background: #075B47;
-
-    color: white;
-}
-
-/* About Icon */
-
-.about-icon {
-    width: 70px;
-
-    height: 70px;
-
-    margin: 0 auto 15px;
-
-    border-radius: 50%;
-
-    background: #075B47;
-
-    color: var(--gold);
-
-    display: flex;
-
-    align-items: center;
-
-    justify-content: center;
-
-    font-size: 30px;
-
-    box-shadow: 0 6px 18px rgba(7, 91, 71, 0.25);
-}
-
-.about-box h2 {
-    margin: 5px 0;
-
-    color: #075B47;
-
-    font-size: 25px;
-}
-
-.about-version {
-    color: #888;
-
-    font-size: 20px;
-
-    margin-bottom: 25px;
-}
-
-/* About Content */
+   28. ABOUT
+   ========================================================= */
 
 .about-content {
     text-align: right;
-
-    background: #F6F8F7;
-
-    border-radius: 14px;
-
-    padding: 15px;
-}
-
-.about-content h2 {
-    text-align: center;
-
-    color: var(--green-dark);
-
-    border-bottom: 2px solid var(--gold);
-
-    padding-bottom: 12px;
-}
-
-.about-content h2 i {
-    color: var(--gold-dark);
-}
-
-.about-content p {
-    margin: 12px 0;
-
-    color: #444;
-
-    font-size: 14px;
-
-    line-height: 1.8;
-}
-
-.about-content i {
-    color: #075B47;
-
-    width: 25px;
-
-    margin-left: 5px;
 }
 
 .about-body h3 {
@@ -1035,8 +942,6 @@ aside input {
     color: var(--muted);
 }
 
-/* About Features */
-
 .about-features {
     display: grid;
 
@@ -1048,31 +953,31 @@ aside input {
 }
 
 .about-features div {
-    background: var(--green-light);
-
     padding: 12px;
-
-    border-radius: 10px;
-
-    color: var(--green-dark);
 
     display: flex;
 
     align-items: center;
 
     gap: 8px;
+
+    background: var(--green-light);
+
+    color: var(--green-dark);
+
+    border-radius: 10px;
 }
 
 .about-features i {
     color: var(--gold-dark);
 }
 
-/* About Footer */
-
 .about-footer {
     display: flex;
 
     justify-content: center;
+
+    flex-wrap: wrap;
 
     gap: 8px;
 
@@ -1089,9 +994,10 @@ aside input {
     font-weight: 600;
 }
 
+
 /* =========================================================
-27. Dark Mode
-========================================================= */
+   29. DARK MODE
+   ========================================================= */
 
 body.dark-mode {
     background: #071C16;
@@ -1099,35 +1005,17 @@ body.dark-mode {
     color: #F8F5EA;
 }
 
-/* Header */
-
 body.dark-mode header {
     background: #032E23;
-
-    border-bottom-color: var(--gold);
 }
-
-/* Header Title */
 
 body.dark-mode header h1 {
     color: var(--gold-light);
 }
 
-/* Top Buttons */
-
 body.dark-mode .top-buttons button {
     background: #0A5A43;
-
-    border-color: rgba(232, 199, 102, 0.35);
 }
-
-body.dark-mode .top-buttons button:hover {
-    background: var(--gold);
-
-    color: var(--green-deep);
-}
-
-/* Sidebar / Calendar */
 
 body.dark-mode aside,
 body.dark-mode .calendar {
@@ -1135,18 +1023,6 @@ body.dark-mode .calendar {
 
     color: #F8F5EA;
 }
-
-/* Calendar Header */
-
-body.dark-mode .calendar-header {
-    background: linear-gradient(
-        135deg,
-        #032E23,
-        #0A5A43
-    );
-}
-
-/* Calendar Days */
 
 body.dark-mode #calendar .day,
 body.dark-mode .calendar-grid .day,
@@ -1158,24 +1034,12 @@ body.dark-mode .calendar-day {
     border-color: #275344;
 }
 
-body.dark-mode #calendar .day:hover,
-body.dark-mode .calendar-grid .day:hover,
-body.dark-mode .calendar-day:hover {
-    box-shadow: 0 5px 15px rgba(212, 175, 55, 0.12);
-
-    border-color: var(--gold);
-}
-
-/* Gregorian */
-
 body.dark-mode #calendar .day .gregorian,
 body.dark-mode #calendar .day .gregorian-day,
 body.dark-mode .calendar-day .gregorian,
 body.dark-mode .calendar-day .gregorian-day {
     color: var(--gold-light);
 }
-
-/* Hijri */
 
 body.dark-mode #calendar .day .hijri,
 body.dark-mode #calendar .day .hijri-day,
@@ -1184,8 +1048,6 @@ body.dark-mode .calendar-day .hijri-day {
     color: #C9D8D2;
 }
 
-/* Today */
-
 body.dark-mode #calendar .day.today,
 body.dark-mode .calendar-day.today {
     background: linear-gradient(
@@ -1193,17 +1055,7 @@ body.dark-mode .calendar-day.today {
         #032E23,
         #0F6B50
     );
-
-    border-color: var(--gold);
 }
-
-/* Today Info */
-
-body.dark-mode .today-info {
-    color: #E5EEE9;
-}
-
-/* Inputs */
 
 body.dark-mode input,
 body.dark-mode select {
@@ -1213,8 +1065,6 @@ body.dark-mode select {
 
     border-color: #396355;
 }
-
-/* Modal */
 
 body.dark-mode .modal-content {
     background: #0B2920;
@@ -1226,29 +1076,8 @@ body.dark-mode .modal-content h2 {
     color: var(--gold-light);
 }
 
-/* About */
-
-body.dark-mode .about-box {
-    background: #0B2920;
-
-    color: #F8F5EA;
-}
-
 body.dark-mode .about-content {
     background: #10372B;
-}
-
-body.dark-mode .about-content h2,
-body.dark-mode .about-box h2 {
-    color: var(--gold-light);
-}
-
-body.dark-mode .about-content p {
-    color: #C9D8D2;
-}
-
-body.dark-mode .about-body h3 {
-    color: var(--gold-light);
 }
 
 body.dark-mode .about-body p {
@@ -1261,100 +1090,85 @@ body.dark-mode .about-features div {
     color: var(--gold-light);
 }
 
-body.dark-mode .about-close {
-    background: #12352B;
-
-    color: var(--gold-light);
-}
-
-body.dark-mode .about-footer {
-    color: var(--gold-light);
-}
-
-/* Details */
-
 body.dark-mode .detail-event {
     background: #12352B;
 }
 
+
 /* =========================================================
-28. Responsive - Tablet
-========================================================= */
+   30. TABLET
+   601px - 900px
+   ========================================================= */
 
-@media (max-width: 900px) {
+@media (min-width: 601px) and (max-width: 900px) {
 
-    main {
-        grid-template-columns: 1fr;
-
-        padding: 15px;
+    header {
+        padding: 11px 16px;
     }
 
-    .calendar-header h2 {
-        font-size: 22px;
+    header h1 {
+        font-size: 23px;
     }
 
-    #calendar,
-    .calendar-grid {
-        gap: 5px;
-    }
+    .top-buttons button {
+        padding: 7px 10px;
 
-    #calendar .day,
-    .calendar-grid .day,
-    .calendar-day {
-        min-height: 100px;
-
-        height: 100px;
-
-        padding: 6px 4px;
-    }
-
-    #calendar .empty,
-    .calendar-grid .empty {
-        min-height: 100px;
-
-        height: 100px;
-    }
-
-    #calendar .day .gregorian-day,
-    #calendar .day .gregorian,
-    .calendar-day .gregorian-day,
-    .calendar-day .gregorian {
-        font-size: 17px;
-    }
-
-    #calendar .day .hijri-day,
-    #calendar .day .hijri,
-    .calendar-day .hijri-day,
-    .calendar-day .hijri {
         font-size: 12px;
     }
 
-    #calendar .day .mini-event,
-    .calendar-day .mini-event {
+    main {
+        padding: 11px;
+
+        gap: 11px;
+
+        grid-template-columns: 220px minmax(0, 1fr);
+    }
+
+    aside {
+        padding: 11px;
+
+        max-height: calc(100vh - 85px);
+
+        position: sticky;
+
+        top: 8px;
+    }
+
+    aside h2 {
+        font-size: 17px;
+    }
+
+    .events-panel {
+        max-height: calc(100vh - 145px);
+    }
+
+    .sidebar-event-row {
         font-size: 11px;
     }
 
-    #monthlyEvents .event {
-        font-size: 18px;
-
-        line-height: 1.9;
-    }
-}
-
-/* =========================================================
-29. Responsive - Mobile
-========================================================= */
-
-@media (max-width: 600px) {
-
-    main {
-        min-width: 0;
-    }
-
     .calendar {
-        min-width: 0;
+        padding: 11px;
+    }
 
-        padding: 12px;
+    .calendar-header {
+        padding: 9px 10px;
+
+        margin-bottom: 10px;
+    }
+
+    .calendar-header h2 {
+        font-size: 20px;
+    }
+
+    .today-info {
+        font-size: 14px;
+    }
+
+    .nav-btn {
+        width: 34px;
+        height: 34px;
+
+        font-size: 14px;
     }
 
     #calendar,
@@ -1362,159 +1176,70 @@ body.dark-mode .detail-event {
         gap: 3px;
     }
 
-    #calendar .day,
-    .calendar-grid .day,
-    .calendar-day {
-        min-height: 85px;
+    .day-name {
+        padding: 6px 2px;
 
-        height: 85px;
-
-        padding: 5px 3px;
-
-        border-radius: 7px;
+        font-size: 10px;
     }
 
+    #calendar .day,
+    .calendar-grid .day,
+    .calendar-day,
     #calendar .empty,
     .calendar-grid .empty {
-        min-height: 85px;
+        height: 70px;
 
-        height: 85px;
-
-        border-radius: 7px;
+        min-height: 70px;
     }
 
     #calendar .day .gregorian-day,
     #calendar .day .gregorian,
     .calendar-day .gregorian-day,
     .calendar-day .gregorian {
-        font-size: 15px;
-
-        margin-bottom: 2px;
+        font-size: 13px;
     }
 
     #calendar .day .hijri-day,
     #calendar .day .hijri,
     .calendar-day .hijri-day,
     .calendar-day .hijri {
-        font-size: 10px;
-
-        margin-bottom: 3px;
+        font-size: 9px;
     }
-
-    /* تحسين رأس التقويم على الموبايل */
-
-    .calendar-header {
-        padding: 12px 8px;
-
-        gap: 8px;
-    }
-
-    .calendar-header h2 {
-        font-size: 19px;
-    }
-
-    .today-info {
-        font-size: 17px;
-    }
-
-    /* تكبير المناسبات داخل خلايا التقويم */
 
     #calendar .day .mini-event,
     .calendar-day .mini-event {
-        font-size: 11px;
-
-        line-height: 1.4;
-
-        -webkit-line-clamp: 2;
-    }
-
-    /* تكبير قائمة مناسبات الشهر */
-
-    #monthlyEvents .event {
-        font-size: 19px;
-
-        line-height: 2;
-
-        padding: 13px 12px;
-    }
-
-    #monthlyEvents .event-icon {
-        font-size: 24px;
-    }
-
-    /* About App - Mobile Readability */
-
-    .about-content {
-        width: 92%;
-
-        max-height: 90vh;
-
-        overflow-y: auto;
-
-        padding: 22px 18px;
-    }
-
-    .about-content h2 {
-        font-size: 23px;
-
-        margin-bottom: 18px;
-    }
-
-    .about-body h3 {
-        font-size: 18px;
-
-        line-height: 1.7;
-    }
-
-    .about-body p {
-        font-size: 16px;
-
-        line-height: 1.9;
-    }
-
-    .about-features {
-        gap: 8px;
-    }
-
-    .about-features div {
-        font-size: 15px;
-
-        line-height: 1.7;
-
-        padding: 11px;
-    }
-
-    .about-footer {
-        flex-wrap: wrap;
-
-        font-size: 14px;
-
-        line-height: 1.8;
-    }
-
-    #closeAbout {
-        font-size: 30px;
+        font-size: 7px;
     }
 }
 
-/* =========================================================
-30. Small Mobile Header
-========================================================= */
 
-@media (max-width: 500px) {
+/* =========================================================
+   31. MOBILE
+   <= 600px
+   ========================================================= */
+
+@media (max-width: 600px) {
 
     header {
+        min-height: auto;
+
+        padding: 10px;
+
         flex-direction: column;
 
-        gap: 15px;
+        justify-content: center;
 
         text-align: center;
 
-        padding: 20px 15px;
+        gap: 8px;
     }
 
     header h1 {
-        font-size: 25px;
+        font-size: 20px;
+
+        white-space: normal;
+
+        line-height: 1.4;
     }
 
     .top-buttons {
@@ -1522,65 +1247,343 @@ body.dark-mode .detail-event {
 
         justify-content: center;
 
-        flex-wrap: wrap;
+        gap: 5px;
     }
 
     .top-buttons button {
-        padding: 10px 14px;
-
-        font-size: 14px;
-
         flex: 1;
 
-        min-width: 120px;
+        min-width: 0;
+
+        padding: 6px 7px;
+
+        font-size: 11px;
     }
 
-    .stats {
-        grid-template-columns: 1fr;
+
+    /* =====================================================
+       MAIN
+       ===================================================== */
+
+    main {
+        width: 100%;
+
+        padding: 7px;
+
+        display: flex;
+
+        flex-direction: column;
+
+        gap: 9px;
+    }
+
+
+    /* =====================================================
+       CALENDAR FIRST
+       ===================================================== */
+
+    .calendar {
+        order: 1;
+
+        width: 100%;
+
+        padding: 7px;
+
+        border-radius: 11px;
+    }
+
+
+    /* =====================================================
+       EVENTS SECOND
+       ===================================================== */
+
+    aside {
+        order: 2;
+
+        width: 100%;
+
+        position: static;
+
+        max-height: 400px;
+
+        overflow: hidden;
+
+        padding: 10px;
+
+        border-radius: 11px;
+    }
+
+    .events-panel {
+        max-height: 330px;
+
+        overflow-y: auto;
+
+        overflow-x: hidden;
+    }
+
+    aside h2 {
+        font-size: 17px;
+
+        margin-bottom: 8px;
+    }
+
+
+    /* =====================================================
+       CALENDAR HEADER
+       ===================================================== */
+
+    .calendar-header {
+        padding: 8px 5px;
+
+        gap: 4px;
+
+        margin-bottom: 8px;
+
+        border-radius: 9px;
+    }
+
+    .calendar-header h2 {
+        font-size: 16px;
+
+        white-space: nowrap;
+    }
+
+    .today-info {
+        font-size: 12px;
+
+        gap: 1px;
+    }
+
+    .nav-btn {
+        width: 31px;
+
+        height: 31px;
+
+        font-size: 13px;
+    }
+
+
+    /* =====================================================
+       CALENDAR GRID
+       ===================================================== */
+
+    #calendar,
+    .calendar-grid {
+        gap: 2px;
+    }
+
+    .day-name {
+        padding: 5px 1px;
+
+        font-size: 9px;
+
+        border-radius: 4px;
+    }
+
+    #calendar .day,
+    .calendar-grid .day,
+    .calendar-day {
+        height: 65px;
+
+        min-height: 65px;
+
+        padding: 3px 2px;
+
+        border-radius: 5px;
+    }
+
+    #calendar .empty,
+    .calendar-grid .empty {
+        height: 65px;
+
+        min-height: 65px;
+    }
+
+    #calendar .day .gregorian-day,
+    #calendar .day .gregorian,
+    .calendar-day .gregorian-day,
+    .calendar-day .gregorian {
+        font-size: 12px;
+
+        margin-bottom: 1px;
+    }
+
+    #calendar .day .hijri-day,
+    #calendar .day .hijri,
+    .calendar-day .hijri-day,
+    .calendar-day .hijri {
+        font-size: 8px;
+
+        margin-bottom: 1px;
+
+        min-height: 14px;
+    }
+
+    #calendar .day .mini-event,
+    .calendar-day .mini-event {
+        font-size: 7px;
+
+        line-height: 1.15;
+
+        -webkit-line-clamp: 2;
+    }
+
+
+    /* =====================================================
+       SIDEBAR EVENTS
+       ===================================================== */
+
+    .sidebar-event-row {
+        font-size: 12px;
+    }
+
+    .sidebar-holiday {
+        font-size: 9px;
+    }
+
+    .event {
+        padding: 8px;
+
+        margin-bottom: 5px;
+    }
+
+    .event-icon {
+        font-size: 18px;
+    }
+
+
+    /* =====================================================
+       MODALS ON MOBILE
+       ===================================================== */
+
+    .modal {
+        padding: 10px;
     }
 
     .modal-content {
-        width: 90%;
+        width: 100%;
 
-        padding: 20px;
+        max-width: 100%;
+
+        padding: 18px;
+
+        border-radius: 15px;
+    }
+
+    .modal-content h2 {
+        font-size: 20px;
     }
 
     .about-features {
         grid-template-columns: 1fr;
     }
+}
 
-    /* تحسين قراءة المناسبات على الشاشات الصغيرة جدًا */
 
-    #monthlyEvents .event {
-        font-size: 19px;
+/* =========================================================
+   32. VERY SMALL PHONES
+   <= 400px
+   ========================================================= */
 
-        line-height: 2;
+@media (max-width: 400px) {
 
-        padding: 14px 12px;
+    header h1 {
+        font-size: 18px;
+    }
+
+    .top-buttons button {
+        font-size: 10px;
+
+        padding: 5px 5px;
+    }
+
+    main {
+        padding: 5px;
+
+        gap: 7px;
+    }
+
+    .calendar {
+        padding: 5px;
+    }
+
+    .calendar-header {
+        padding: 6px 3px;
+    }
+
+    .calendar-header h2 {
+        font-size: 14px;
+    }
+
+    .today-info {
+        font-size: 10px;
+    }
+
+    .nav-btn {
+        width: 28px;
+
+        height: 28px;
+
+        font-size: 12px;
+    }
+
+    #calendar,
+    .calendar-grid {
+        gap: 1px;
+    }
+
+    .day-name {
+        font-size: 8px;
+
+        padding: 4px 1px;
+    }
+
+    #calendar .day,
+    .calendar-grid .day,
+    .calendar-day {
+        height: 58px;
+
+        min-height: 58px;
+
+        padding: 2px 1px;
+    }
+
+    #calendar .empty,
+    .calendar-grid .empty {
+        height: 58px;
+
+        min-height: 58px;
+    }
+
+    #calendar .day .gregorian-day,
+    #calendar .day .gregorian,
+    .calendar-day .gregorian-day,
+    .calendar-day .gregorian {
+        font-size: 11px;
+    }
+
+    #calendar .day .hijri-day,
+    #calendar .day .hijri,
+    .calendar-day .hijri-day,
+    .calendar-day .hijri {
+        font-size: 7px;
+    }
+
+    #calendar .day .mini-event,
+    .calendar-day .mini-event {
+        font-size: 6px;
+    }
+
+    aside {
+        max-height: 350px;
+    }
+
+    .events-panel {
+        max-height: 285px;
     }
 }
-/* =================================
-   المناسبة في القائمة الجانبية
-   ================================= */
 
-.sidebar-event-row {
-    display: flex;
-    align-items: center;
-    gap: 5px;
-    flex-wrap: wrap;
-}
 
-.sidebar-event-day {
-    font-weight: bold;
-}
-
-.sidebar-event-title {
-    flex: 1;
-}
-
-.sidebar-holiday {
-    color: #C62828;
-    font-weight: bold;
-    font-size: 11px;
-    white-space: nowrap;
-}
+/* =========================================================
+   END
+   ========================================================= */
