@@ -243,6 +243,7 @@ aside h2 {
 
 /* =========================================================
    8. REAL EVENTS CONTAINER
+   #month-events-list
    ========================================================= */
 
 #month-events-list {
@@ -1220,6 +1221,8 @@ body.dark-mode .detail-event {
 
 @media (max-width: 600px) {
 
+    /* ================= HEADER ================= */
+
     header {
         min-height: auto;
 
@@ -1238,8 +1241,6 @@ body.dark-mode .detail-event {
         font-size: 20px;
 
         white-space: normal;
-
-        line-height: 1.4;
     }
 
     .top-buttons {
@@ -1261,44 +1262,38 @@ body.dark-mode .detail-event {
     }
 
 
-    /* =====================================================
-       MAIN
-       ===================================================== */
+    /* ================= MAIN ================= */
 
     main {
         width: 100%;
 
         padding: 7px;
 
-        display: flex;
+        display: flex !important;
 
-        flex-direction: column;
+        flex-direction: column !important;
 
         gap: 9px;
     }
 
 
-    /* =====================================================
-       CALENDAR FIRST
-       ===================================================== */
+    /* =================================================
+       CALENDAR ALWAYS FIRST
+       ================================================= */
 
-    .calendar {
-        order: 1;
+    main .calendar {
+        order: 1 !important;
 
         width: 100%;
-
-        padding: 7px;
-
-        border-radius: 11px;
     }
 
 
-    /* =====================================================
-       EVENTS SECOND
-       ===================================================== */
+    /* =================================================
+       EVENTS ALWAYS SECOND
+       ================================================= */
 
-    aside {
-        order: 2;
+    main aside {
+        order: 2 !important;
 
         width: 100%;
 
@@ -1312,6 +1307,9 @@ body.dark-mode .detail-event {
 
         border-radius: 11px;
     }
+
+
+    /* ================= EVENTS ================= */
 
     .events-panel {
         max-height: 330px;
@@ -1328,9 +1326,13 @@ body.dark-mode .detail-event {
     }
 
 
-    /* =====================================================
-       CALENDAR HEADER
-       ===================================================== */
+    /* ================= CALENDAR ================= */
+
+    .calendar {
+        padding: 7px;
+
+        border-radius: 11px;
+    }
 
     .calendar-header {
         padding: 8px 5px;
@@ -1344,8 +1346,6 @@ body.dark-mode .detail-event {
 
     .calendar-header h2 {
         font-size: 16px;
-
-        white-space: nowrap;
     }
 
     .today-info {
@@ -1363,12 +1363,14 @@ body.dark-mode .detail-event {
     }
 
 
-    /* =====================================================
-       CALENDAR GRID
-       ===================================================== */
+    /* ================= CALENDAR GRID ================= */
 
     #calendar,
     .calendar-grid {
+        width: 100%;
+
+        grid-template-columns: repeat(7, minmax(0, 1fr));
+
         gap: 2px;
     }
 
@@ -1415,8 +1417,6 @@ body.dark-mode .detail-event {
         font-size: 8px;
 
         margin-bottom: 1px;
-
-        min-height: 14px;
     }
 
     #calendar .day .mini-event,
@@ -1429,9 +1429,7 @@ body.dark-mode .detail-event {
     }
 
 
-    /* =====================================================
-       SIDEBAR EVENTS
-       ===================================================== */
+    /* ================= SIDEBAR EVENTS ================= */
 
     .sidebar-event-row {
         font-size: 12px;
@@ -1450,32 +1448,52 @@ body.dark-mode .detail-event {
     .event-icon {
         font-size: 18px;
     }
+}
 
 
-    /* =====================================================
-       MODALS ON MOBILE
-       ===================================================== */
+/* =========================================================
+   31.5. MOBILE LANDSCAPE
+   الهاتف بالعرض
+   ========================================================= */
 
-    .modal {
-        padding: 10px;
-    }
+@media (max-width: 900px) and (orientation: landscape) {
 
-    .modal-content {
+    main {
         width: 100%;
 
-        max-width: 100%;
+        padding: 7px;
 
-        padding: 18px;
+        display: flex !important;
 
-        border-radius: 15px;
+        flex-direction: column !important;
+
+        gap: 9px;
     }
 
-    .modal-content h2 {
-        font-size: 20px;
+    main .calendar {
+        order: 1 !important;
+
+        width: 100%;
     }
 
-    .about-features {
-        grid-template-columns: 1fr;
+    main aside {
+        order: 2 !important;
+
+        width: 100%;
+
+        position: static;
+
+        max-height: 300px;
+
+        overflow: hidden;
+    }
+
+    .events-panel {
+        max-height: 230px;
+
+        overflow-y: auto;
+
+        overflow-x: hidden;
     }
 }
 
