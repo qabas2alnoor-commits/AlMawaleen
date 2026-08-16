@@ -1,73 +1,1567 @@
-const CACHE_NAME = "mawaqit-alwalaa-v1";
+/* =========================================================
+   مواقيت الولاء
+   Final Responsive Layout
+   ========================================================= */
 
-const STATIC_ASSETS = [
-  "./",
-  "./index.html",
-  "./manifest.json",
-  "./favicon.png",
-  "./css/style.css"
-];
 
-// تثبيت Service Worker
-self.addEventListener("install", (event) => {
-  event.waitUntil(
-    caches.open(CACHE_NAME).then((cache) => {
-      return cache.addAll(STATIC_ASSETS);
-    })
-  );
+/* =========================================================
+   1. COLORS
+   ========================================================= */
 
-  self.skipWaiting();
-});
+:root {
+    --green-dark: #064E3B;
+    --green-deep: #043C2E;
+    --green: #0F6B50;
+    --green-light: #E8F3EE;
 
-// تفعيل النسخة الجديدة وحذف Cache القديم
-self.addEventListener("activate", (event) => {
-  event.waitUntil(
-    caches.keys().then((cacheNames) => {
-      return Promise.all(
-        cacheNames
-          .filter((name) => name !== CACHE_NAME)
-          .map((name) => caches.delete(name))
-      );
-    })
-  );
+    --gold: #D4AF37;
+    --gold-light: #E8C766;
+    --gold-dark: #A67C00;
 
-  self.clients.claim();
-});
+    --cream: #F8F5EA;
 
-// التعامل مع الطلبات
-self.addEventListener("fetch", (event) => {
-  const request = event.request;
-  const url = new URL(request.url);
+    --white: #FFFFFF;
+    --text: #18352C;
+    --muted: #65756E;
 
-  // لا نخزن Supabase أو API في Cache
-  if (
-    url.hostname.includes("supabase.co") ||
-    url.hostname.includes("aladhan.com")
-  ) {
-    return;
-  }
+    --border: #D9E3DE;
 
-  // ملفات التطبيق الثابتة:
-  // Cache First ثم الشبكة
-  if (request.method === "GET" && url.origin === self.location.origin) {
-    event.respondWith(
-      caches.match(request).then((cachedResponse) => {
-        if (cachedResponse) {
-          return cachedResponse;
-        }
+    --danger: #C62828;
+    --danger-light: #FFE4E4;
 
-        return fetch(request).then((networkResponse) => {
-          if (networkResponse && networkResponse.ok) {
-            const responseClone = networkResponse.clone();
+    --success: #287D4A;
+    --success-light: #E2F3E7;
+}
 
-            caches.open(CACHE_NAME).then((cache) => {
-              cache.put(request, responseClone);
-            });
-          }
 
-          return networkResponse;
-        });
-      })
+/* =========================================================
+   2. GENERAL
+   ========================================================= */
+
+* {
+    box-sizing: border-box;
+}
+
+html,
+body {
+    width: 100%;
+    min-width: 0;
+}
+
+body {
+    margin: 0;
+
+    font-family: 'Cairo', sans-serif;
+
+    direction: rtl;
+
+    background: var(--cream);
+
+    color: var(--text);
+
+    overflow-x: hidden;
+}
+
+button,
+input,
+select {
+    font-family: 'Cairo', sans-serif;
+}
+
+button {
+    border: none;
+    cursor: pointer;
+}
+
+
+/* =========================================================
+   3. HEADER
+   ========================================================= */
+
+header {
+    width: 100%;
+
+    min-height: 68px;
+
+    padding: 12px 24px;
+
+    display: flex;
+
+    align-items: center;
+
+    justify-content: space-between;
+
+    gap: 20px;
+
+    background: var(--green-dark);
+
+    border-bottom: 3px solid var(--gold);
+
+    box-shadow: 0 4px 15px rgba(6, 78, 59, 0.25);
+}
+
+header h1 {
+    margin: 0;
+
+    color: var(--gold-light);
+
+    font-size: 27px;
+
+    line-height: 1.3;
+
+    white-space: nowrap;
+}
+
+header h1 i {
+    color: var(--gold);
+
+    margin-left: 7px;
+}
+
+
+/* =========================================================
+   4. TOP BUTTONS
+   ========================================================= */
+
+.top-buttons {
+    display: flex;
+
+    align-items: center;
+
+    gap: 8px;
+
+    flex-wrap: wrap;
+}
+
+.top-buttons button {
+    padding: 8px 14px;
+
+    background: var(--green);
+
+    color: white;
+
+    font-size: 14px;
+
+    border-radius: 9px;
+
+    border: 1px solid rgba(232, 199, 102, 0.35);
+
+    transition: 0.25s;
+}
+
+.top-buttons button:hover {
+    background: var(--gold);
+
+    color: var(--green-deep);
+
+    transform: translateY(-1px);
+}
+
+
+/* =========================================================
+   5. MAIN LAYOUT
+   ========================================================= */
+
+main {
+    width: 100%;
+
+    max-width: 1380px;
+
+    margin: 0 auto;
+
+    padding: 15px 18px;
+
+    display: grid;
+
+    grid-template-columns: 270px minmax(0, 1fr);
+
+    gap: 16px;
+
+    align-items: start;
+}
+
+
+/* =========================================================
+   6. SIDEBAR
+   ========================================================= */
+
+aside {
+    width: 100%;
+
+    min-width: 0;
+
+    background: var(--white);
+
+    padding: 14px;
+
+    border-radius: 14px;
+
+    border-top: 4px solid var(--gold);
+
+    box-shadow: 0 5px 20px rgba(6, 78, 59, 0.10);
+
+    max-height: calc(100vh - 100px);
+
+    overflow: hidden;
+
+    position: sticky;
+
+    top: 12px;
+}
+
+aside h2 {
+    margin: 0 0 10px;
+
+    color: var(--green-dark);
+
+    font-size: 20px;
+
+    line-height: 1.4;
+}
+
+
+/* =========================================================
+   7. EVENTS PANEL
+   ========================================================= */
+
+.events-panel {
+    width: 100%;
+
+    min-width: 0;
+
+    max-height: calc(100vh - 165px);
+
+    overflow-y: auto;
+
+    overflow-x: hidden;
+
+    padding-left: 3px;
+
+    scrollbar-width: thin;
+}
+
+
+/* =========================================================
+   8. REAL EVENTS CONTAINER
+   #month-events-list
+   ========================================================= */
+
+#month-events-list {
+    width: 100%;
+
+    min-width: 0;
+}
+
+
+/* =========================================================
+   9. EVENTS
+   ========================================================= */
+
+.event {
+    width: 100%;
+
+    display: flex;
+
+    align-items: center;
+
+    gap: 8px;
+
+    padding: 8px;
+
+    margin-bottom: 6px;
+
+    border-radius: 9px;
+
+    background: #F4F7F5;
+
+    line-height: 1.6;
+
+    overflow: hidden;
+}
+
+.event-icon {
+    font-size: 20px;
+
+    flex-shrink: 0;
+}
+
+
+/* Birth */
+
+.birth {
+    background: var(--success-light);
+
+    color: var(--success);
+
+    border-right: 4px solid var(--success);
+}
+
+
+/* Death */
+
+.death {
+    background: var(--danger-light);
+
+    color: var(--danger);
+
+    border-right: 4px solid var(--danger);
+}
+
+
+/* Martyr */
+
+.martyr {
+    background: #FFE0E0;
+
+    color: #A51D1D;
+
+    border-right: 4px solid #A51D1D;
+}
+
+
+/* =========================================================
+   10. SIDEBAR EVENT ROW
+   ========================================================= */
+
+.sidebar-event-row {
+    width: 100%;
+
+    display: flex;
+
+    align-items: center;
+
+    flex-wrap: wrap;
+
+    gap: 4px;
+
+    font-size: 13px;
+
+    line-height: 1.6;
+}
+
+.sidebar-event-day {
+    font-weight: bold;
+
+    white-space: nowrap;
+}
+
+.sidebar-event-title {
+    flex: 1;
+
+    min-width: 0;
+
+    overflow-wrap: anywhere;
+}
+
+.sidebar-holiday {
+    color: var(--danger) !important;
+
+    font-weight: bold;
+
+    font-size: 10px;
+
+    white-space: nowrap;
+
+    flex-shrink: 0;
+}
+
+
+/* =========================================================
+   11. CALENDAR
+   ========================================================= */
+
+.calendar {
+    width: 100%;
+
+    min-width: 0;
+
+    background: var(--white);
+
+    padding: 15px;
+
+    border-radius: 14px;
+
+    box-shadow: 0 5px 20px rgba(6, 78, 59, 0.10);
+
+    overflow: hidden;
+}
+
+
+/* =========================================================
+   12. CALENDAR HEADER
+   ========================================================= */
+
+.calendar-header {
+    width: 100%;
+
+    min-width: 0;
+
+    display: flex;
+
+    align-items: center;
+
+    justify-content: space-between;
+
+    gap: 10px;
+
+    padding: 11px 15px;
+
+    margin-bottom: 13px;
+
+    background: linear-gradient(
+        135deg,
+        var(--green-deep),
+        var(--green)
     );
-  }
-});
+
+    border-radius: 12px;
+
+    border-bottom: 3px solid var(--gold);
+
+    color: white;
+}
+
+.header-center {
+    flex: 1;
+
+    min-width: 0;
+
+    text-align: center;
+}
+
+.calendar-header h2 {
+    margin: 0;
+
+    color: var(--gold-light);
+
+    font-size: 24px;
+
+    line-height: 1.3;
+
+    white-space: nowrap;
+}
+
+.today-info {
+    margin-top: 3px;
+
+    display: flex;
+
+    flex-direction: column;
+
+    gap: 1px;
+
+    font-size: 16px;
+
+    line-height: 1.4;
+
+    color: #F8F5EA;
+}
+
+
+/* =========================================================
+   13. NAVIGATION
+   ========================================================= */
+
+.nav-btn {
+    width: 37px;
+
+    height: 37px;
+
+    flex-shrink: 0;
+
+    border-radius: 50%;
+
+    background: rgba(212, 175, 55, 0.20);
+
+    color: var(--gold-light);
+
+    font-size: 16px;
+
+    border: 1px solid rgba(232, 199, 102, 0.45);
+
+    transition: 0.25s;
+}
+
+.nav-btn:hover {
+    background: var(--gold);
+
+    color: var(--green-deep);
+
+    transform: scale(1.05);
+}
+
+
+/* =========================================================
+   14. CALENDAR GRID
+   ========================================================= */
+
+#calendar,
+.calendar-grid {
+    width: 100%;
+
+    min-width: 0;
+
+    display: grid;
+
+    grid-template-columns: repeat(7, minmax(0, 1fr));
+
+    gap: 4px;
+
+    direction: rtl;
+}
+
+
+/* =========================================================
+   15. DAY NAMES
+   ========================================================= */
+
+.day-name {
+    padding: 7px 4px;
+
+    background: var(--green-dark);
+
+    color: var(--gold-light);
+
+    border-radius: 7px;
+
+    border-bottom: 2px solid var(--gold);
+
+    text-align: center;
+
+    font-size: 12px;
+
+    font-weight: bold;
+
+    line-height: 1.3;
+}
+
+
+/* =========================================================
+   16. EMPTY DAYS
+   ========================================================= */
+
+#calendar .empty,
+.calendar-grid .empty {
+    height: 80px;
+
+    min-height: 80px;
+
+    border: 1px solid rgba(0, 80, 60, 0.06);
+
+    border-radius: 7px;
+}
+
+
+/* =========================================================
+   17. CALENDAR DAY
+   ========================================================= */
+
+#calendar .day,
+.calendar-grid .day,
+.calendar-day {
+    height: 80px;
+
+    min-height: 80px;
+
+    padding: 5px 4px;
+
+    display: flex;
+
+    flex-direction: column;
+
+    align-items: stretch;
+
+    position: relative;
+
+    overflow: hidden;
+
+    cursor: pointer;
+
+    background: rgba(255, 255, 255, 0.55);
+
+    border: 1px solid rgba(0, 80, 60, 0.12);
+
+    border-radius: 7px;
+
+    direction: rtl;
+
+    transition: 0.15s;
+}
+
+#calendar .day:hover,
+.calendar-grid .day:hover,
+.calendar-day:hover {
+    background: rgba(0, 90, 70, 0.05);
+
+    border-color: rgba(212, 175, 55, 0.45);
+
+    transform: translateY(-1px);
+}
+
+
+/* =========================================================
+   18. GREGORIAN
+   ========================================================= */
+
+#calendar .day .gregorian-day,
+.calendar-day .gregorian-day,
+#calendar .day .gregorian,
+.calendar-day .gregorian {
+    font-size: 15px;
+
+    font-weight: 700;
+
+    line-height: 1.2;
+
+    text-align: center;
+
+    margin-bottom: 2px;
+
+    color: var(--green-dark);
+}
+
+
+/* =========================================================
+   19. HIJRI
+   ========================================================= */
+
+#calendar .day .hijri-day,
+.calendar-day .hijri-day,
+#calendar .day .hijri,
+.calendar-day .hijri {
+    font-size: 11px;
+
+    line-height: 1.3;
+
+    text-align: center;
+
+    margin-bottom: 2px;
+
+    min-height: 17px;
+
+    white-space: nowrap;
+
+    overflow: hidden;
+
+    text-overflow: ellipsis;
+
+    color: var(--muted);
+}
+
+
+/* =========================================================
+   20. DAY EVENTS
+   ========================================================= */
+
+#calendar .day .day-events,
+.calendar-day .day-events {
+    width: 100%;
+
+    margin-top: auto;
+
+    display: flex;
+
+    flex-direction: column;
+
+    align-items: center;
+
+    gap: 2px;
+
+    overflow: hidden;
+}
+
+
+/* =========================================================
+   21. MINI EVENTS
+   ========================================================= */
+
+#calendar .day .mini-event,
+.calendar-day .mini-event {
+    width: 100%;
+
+    padding: 1px 2px;
+
+    font-size: 9px;
+
+    line-height: 1.25;
+
+    text-align: center;
+
+    overflow: hidden;
+
+    display: -webkit-box;
+
+    -webkit-box-orient: vertical;
+
+    -webkit-line-clamp: 2;
+
+    overflow-wrap: anywhere;
+
+    direction: rtl;
+}
+
+
+/* =========================================================
+   22. EVENT COLORS
+   ========================================================= */
+
+.green-day {
+    background: linear-gradient(
+        135deg,
+        #E8F3EE,
+        #D9EEE4
+    ) !important;
+
+    border: 2px solid var(--green) !important;
+}
+
+.red-day {
+    background: #FFE7E7 !important;
+
+    border: 2px solid var(--danger) !important;
+}
+
+.blue-day {
+    background: linear-gradient(
+        135deg,
+        #FFF8DC,
+        #F6E8B1
+    ) !important;
+
+    border: 2px solid var(--gold) !important;
+}
+
+
+/* =========================================================
+   23. TODAY
+   ========================================================= */
+
+#calendar .day.today,
+.calendar-day.today {
+    background: linear-gradient(
+        135deg,
+        var(--green-dark),
+        var(--green)
+    );
+
+    color: white;
+
+    border: 3px solid var(--gold);
+
+    box-shadow: 0 6px 16px rgba(6, 78, 59, 0.25);
+}
+
+#calendar .day.today .gregorian,
+#calendar .day.today .gregorian-day,
+.calendar-day.today .gregorian,
+.calendar-day.today .gregorian-day {
+    color: var(--gold-light);
+}
+
+#calendar .day.today .hijri,
+#calendar .day.today .hijri-day,
+.calendar-day.today .hijri,
+.calendar-day.today .hijri-day {
+    color: #F8F5EA;
+}
+
+
+/* =========================================================
+   24. MODALS
+   ========================================================= */
+
+.modal {
+    display: none;
+
+    position: fixed;
+
+    inset: 0;
+
+    z-index: 1000;
+
+    padding: 20px;
+
+    justify-content: center;
+
+    align-items: center;
+
+    background: rgba(4, 60, 46, 0.70);
+}
+
+.modal.show {
+    display: flex;
+}
+
+.modal-content {
+    width: 400px;
+
+    max-width: 100%;
+
+    padding: 25px;
+
+    background: var(--white);
+
+    border-radius: 20px;
+
+    border-top: 4px solid var(--gold);
+
+    box-shadow: 0 15px 40px rgba(0, 0, 0, 0.25);
+}
+
+.modal-content h2 {
+    color: var(--green-dark);
+}
+
+.modal-content input,
+.modal-content select {
+    width: 100%;
+
+    padding: 12px;
+
+    margin: 8px 0;
+
+    border-radius: 10px;
+
+    border: 1px solid var(--border);
+}
+
+
+/* =========================================================
+   25. MODAL CLOSE
+   ========================================================= */
+
+#closeModal,
+#closeDetails,
+#closeAbout {
+    float: left;
+
+    font-size: 30px;
+
+    cursor: pointer;
+
+    color: var(--green-dark);
+
+    transition: 0.25s;
+}
+
+#closeModal:hover,
+#closeDetails:hover,
+#closeAbout:hover {
+    color: var(--gold-dark);
+
+    transform: scale(1.1);
+}
+
+
+/* =========================================================
+   26. SAVE
+   ========================================================= */
+
+#saveEvent {
+    width: 100%;
+
+    padding: 12px;
+
+    background: var(--green-dark);
+
+    color: white;
+
+    border-radius: 10px;
+
+    border: 1px solid var(--gold);
+}
+
+#saveEvent:hover {
+    background: var(--gold);
+
+    color: var(--green-deep);
+}
+
+
+/* =========================================================
+   27. DETAILS
+   ========================================================= */
+
+.detail-event {
+    display: flex;
+
+    justify-content: space-between;
+
+    align-items: center;
+
+    gap: 10px;
+
+    padding: 15px;
+
+    margin-bottom: 10px;
+
+    background: #F2F6F3;
+
+    border-radius: 12px;
+
+    border-right: 3px solid var(--gold);
+}
+
+.edit-btn {
+    padding: 7px 12px;
+
+    background: var(--green);
+
+    color: white;
+
+    border-radius: 8px;
+}
+
+.delete-btn {
+    padding: 7px 12px;
+
+    background: var(--danger);
+
+    color: white;
+
+    border-radius: 8px;
+}
+
+
+/* =========================================================
+   28. ABOUT
+   ========================================================= */
+
+.about-content {
+    text-align: right;
+}
+
+.about-body h3 {
+    color: var(--green);
+
+    margin-bottom: 10px;
+}
+
+.about-body p {
+    line-height: 1.9;
+
+    color: var(--muted);
+}
+
+.about-features {
+    display: grid;
+
+    grid-template-columns: repeat(2, 1fr);
+
+    gap: 10px;
+
+    margin-top: 20px;
+}
+
+.about-features div {
+    padding: 12px;
+
+    display: flex;
+
+    align-items: center;
+
+    gap: 8px;
+
+    background: var(--green-light);
+
+    color: var(--green-dark);
+
+    border-radius: 10px;
+}
+
+.about-features i {
+    color: var(--gold-dark);
+}
+
+.about-footer {
+    display: flex;
+
+    justify-content: center;
+
+    flex-wrap: wrap;
+
+    gap: 8px;
+
+    margin-top: 20px;
+
+    padding-top: 15px;
+
+    border-top: 1px solid var(--border);
+
+    color: var(--green-dark);
+
+    font-size: 13px;
+
+    font-weight: 600;
+}
+
+
+/* =========================================================
+   29. DARK MODE
+   ========================================================= */
+
+body.dark-mode {
+    background: #071C16;
+
+    color: #F8F5EA;
+}
+
+body.dark-mode header {
+    background: #032E23;
+}
+
+body.dark-mode header h1 {
+    color: var(--gold-light);
+}
+
+body.dark-mode .top-buttons button {
+    background: #0A5A43;
+}
+
+body.dark-mode aside,
+body.dark-mode .calendar {
+    background: #0B2920;
+
+    color: #F8F5EA;
+}
+
+body.dark-mode #calendar .day,
+body.dark-mode .calendar-grid .day,
+body.dark-mode .calendar-day {
+    background: #10372B;
+
+    color: #F8F5EA;
+
+    border-color: #275344;
+}
+
+body.dark-mode #calendar .day .gregorian,
+body.dark-mode #calendar .day .gregorian-day,
+body.dark-mode .calendar-day .gregorian,
+body.dark-mode .calendar-day .gregorian-day {
+    color: var(--gold-light);
+}
+
+body.dark-mode #calendar .day .hijri,
+body.dark-mode #calendar .day .hijri-day,
+body.dark-mode .calendar-day .hijri,
+body.dark-mode .calendar-day .hijri-day {
+    color: #C9D8D2;
+}
+
+body.dark-mode #calendar .day.today,
+body.dark-mode .calendar-day.today {
+    background: linear-gradient(
+        135deg,
+        #032E23,
+        #0F6B50
+    );
+}
+
+body.dark-mode input,
+body.dark-mode select {
+    background: #12352B;
+
+    color: white;
+
+    border-color: #396355;
+}
+
+body.dark-mode .modal-content {
+    background: #0B2920;
+
+    color: #F8F5EA;
+}
+
+body.dark-mode .modal-content h2 {
+    color: var(--gold-light);
+}
+
+body.dark-mode .about-content {
+    background: #10372B;
+}
+
+body.dark-mode .about-body p {
+    color: #C9D8D2;
+}
+
+body.dark-mode .about-features div {
+    background: #10372B;
+
+    color: var(--gold-light);
+}
+
+body.dark-mode .detail-event {
+    background: #12352B;
+}
+
+
+/* =========================================================
+   30. TABLET
+   601px - 900px
+   ========================================================= */
+
+@media (min-width: 601px) and (max-width: 900px) {
+
+    header {
+        padding: 11px 16px;
+    }
+
+    header h1 {
+        font-size: 23px;
+    }
+
+    .top-buttons button {
+        padding: 7px 10px;
+
+        font-size: 12px;
+    }
+
+    main {
+        padding: 11px;
+
+        gap: 11px;
+
+        grid-template-columns: 220px minmax(0, 1fr);
+    }
+
+    aside {
+        padding: 11px;
+
+        max-height: calc(100vh - 85px);
+
+        position: sticky;
+
+        top: 8px;
+    }
+
+    aside h2 {
+        font-size: 17px;
+    }
+
+    .events-panel {
+        max-height: calc(100vh - 145px);
+    }
+
+    .sidebar-event-row {
+        font-size: 11px;
+    }
+
+    .calendar {
+        padding: 11px;
+    }
+
+    .calendar-header {
+        padding: 9px 10px;
+
+        margin-bottom: 10px;
+    }
+
+    .calendar-header h2 {
+        font-size: 20px;
+    }
+
+    .today-info {
+        font-size: 14px;
+    }
+
+    .nav-btn {
+        width: 34px;
+        height: 34px;
+
+        font-size: 14px;
+    }
+
+    #calendar,
+    .calendar-grid {
+        gap: 3px;
+    }
+
+    .day-name {
+        padding: 6px 2px;
+
+        font-size: 10px;
+    }
+
+    #calendar .day,
+    .calendar-grid .day,
+    .calendar-day,
+    #calendar .empty,
+    .calendar-grid .empty {
+        height: 70px;
+
+        min-height: 70px;
+    }
+
+    #calendar .day .gregorian-day,
+    #calendar .day .gregorian,
+    .calendar-day .gregorian-day,
+    .calendar-day .gregorian {
+        font-size: 13px;
+    }
+
+    #calendar .day .hijri-day,
+    #calendar .day .hijri,
+    .calendar-day .hijri-day,
+    .calendar-day .hijri {
+        font-size: 9px;
+    }
+
+    #calendar .day .mini-event,
+    .calendar-day .mini-event {
+        font-size: 7px;
+    }
+}
+
+
+/* =========================================================
+   31. MOBILE
+   <= 600px
+   ========================================================= */
+
+/* =========================================================
+   31. MOBILE
+   <= 600px
+   ترتيب الهاتف:
+   1. التقويم
+   2. المناسبات
+   ========================================================= */
+
+@media (max-width: 600px) {
+
+    /* ================= HEADER ================= */
+
+    header {
+        min-height: auto;
+        padding: 10px;
+        flex-direction: column;
+        justify-content: center;
+        text-align: center;
+        gap: 8px;
+    }
+
+    header h1 {
+        font-size: 20px;
+        white-space: normal;
+    }
+
+    .top-buttons {
+        width: 100%;
+        justify-content: center;
+        gap: 5px;
+    }
+
+    .top-buttons button {
+        flex: 1;
+        min-width: 0;
+        padding: 6px 7px;
+        font-size: 11px;
+    }
+
+
+    /* ================= MAIN ================= */
+
+    main {
+        width: 100%;
+        padding: 7px;
+
+        display: flex;
+        flex-direction: column;
+
+        gap: 9px;
+
+        /*
+         * مهم:
+         * نلغي أي ترتيب سابق
+         */
+        direction: rtl;
+    }
+
+
+    /* ================= CALENDAR ================= */
+
+    .calendar {
+        width: 100%;
+
+        /*
+         * التقويم يظهر أولاً
+         */
+        order: 1;
+
+        padding: 7px;
+
+        border-radius: 11px;
+
+        flex: none;
+    }
+
+
+    /* ================= EVENTS ================= */
+
+    aside {
+        width: 100%;
+
+        /*
+         * المناسبات تظهر بعد التقويم
+         */
+        order: 2;
+
+        position: static;
+
+        max-height: 400px;
+
+        overflow: hidden;
+
+        padding: 10px;
+
+        border-radius: 11px;
+
+        flex: none;
+    }
+
+    .events-panel {
+        max-height: 330px;
+
+        overflow-y: auto;
+        overflow-x: hidden;
+    }
+
+    aside h2 {
+        font-size: 17px;
+        margin-bottom: 8px;
+    }
+
+
+    /* ================= CALENDAR HEADER ================= */
+
+    .calendar-header {
+        padding: 8px 5px;
+
+        gap: 4px;
+
+        margin-bottom: 8px;
+
+        border-radius: 9px;
+    }
+
+    .calendar-header h2 {
+        font-size: 16px;
+    }
+
+    .today-info {
+        font-size: 12px;
+        gap: 1px;
+    }
+
+    .nav-btn {
+        width: 31px;
+        height: 31px;
+        font-size: 13px;
+    }
+
+
+    /* ================= CALENDAR GRID ================= */
+
+    #calendar,
+    .calendar-grid {
+        width: 100%;
+
+        display: grid;
+
+        grid-template-columns: repeat(7, minmax(0, 1fr));
+
+        gap: 2px;
+    }
+
+
+    /* ================= DAY NAMES ================= */
+
+    .day-name {
+        padding: 5px 1px;
+
+        font-size: 9px;
+
+        border-radius: 4px;
+    }
+
+
+    /* ================= DAYS ================= */
+
+    #calendar .day,
+    .calendar-grid .day,
+    .calendar-day {
+        width: 100%;
+
+        height: 65px;
+
+        min-height: 65px;
+
+        padding: 3px 2px;
+
+        border-radius: 5px;
+    }
+
+    #calendar .empty,
+    .calendar-grid .empty {
+        height: 65px;
+
+        min-height: 65px;
+    }
+
+
+    /* ================= GREGORIAN ================= */
+
+    #calendar .day .gregorian-day,
+    #calendar .day .gregorian,
+    .calendar-day .gregorian-day,
+    .calendar-day .gregorian {
+        font-size: 12px;
+
+        margin-bottom: 1px;
+    }
+
+
+    /* ================= HIJRI ================= */
+
+    #calendar .day .hijri-day,
+    #calendar .day .hijri,
+    .calendar-day .hijri-day,
+    .calendar-day .hijri {
+        font-size: 8px;
+
+        margin-bottom: 1px;
+    }
+
+
+    /* ================= MINI EVENTS ================= */
+
+    #calendar .day .mini-event,
+    .calendar-day .mini-event {
+        font-size: 7px;
+
+        line-height: 1.15;
+
+        -webkit-line-clamp: 2;
+    }
+
+
+    /* ================= SIDEBAR EVENTS ================= */
+
+    .sidebar-event-row {
+        font-size: 12px;
+    }
+
+    .sidebar-holiday {
+        font-size: 9px;
+    }
+
+    .event {
+        padding: 8px;
+        margin-bottom: 5px;
+    }
+
+    .event-icon {
+        font-size: 18px;
+    }
+}
+
+
+/* =========================================================
+   32. VERY SMALL PHONES
+   <= 400px
+   ========================================================= */
+
+@media (max-width: 400px) {
+
+    header h1 {
+        font-size: 18px;
+    }
+
+    .top-buttons button {
+        font-size: 10px;
+        padding: 5px;
+    }
+
+    main {
+        padding: 5px;
+        gap: 7px;
+    }
+
+    .calendar {
+        padding: 5px;
+    }
+
+    .calendar-header {
+        padding: 6px 3px;
+    }
+
+    .calendar-header h2 {
+        font-size: 14px;
+    }
+
+    .today-info {
+        font-size: 10px;
+    }
+
+    .nav-btn {
+        width: 28px;
+        height: 28px;
+        font-size: 12px;
+    }
+
+    #calendar,
+    .calendar-grid {
+        gap: 1px;
+    }
+
+    .day-name {
+        font-size: 8px;
+        padding: 4px 1px;
+    }
+
+    #calendar .day,
+    .calendar-grid .day,
+    .calendar-day {
+        height: 58px;
+        min-height: 58px;
+        padding: 2px 1px;
+    }
+
+    #calendar .empty,
+    .calendar-grid .empty {
+        height: 58px;
+        min-height: 58px;
+    }
+
+    #calendar .day .gregorian-day,
+    #calendar .day .gregorian,
+    .calendar-day .gregorian-day,
+    .calendar-day .gregorian {
+        font-size: 11px;
+    }
+
+    #calendar .day .hijri-day,
+    #calendar .day .hijri,
+    .calendar-day .hijri-day,
+    .calendar-day .hijri {
+        font-size: 7px;
+    }
+
+    #calendar .day .mini-event,
+    .calendar-day .mini-event {
+        font-size: 6px;
+    }
+
+    aside {
+        max-height: 350px;
+    }
+
+    .events-panel {
+        max-height: 285px;
+    }
+}
+
+
+/* =========================================================
+   END
+   ========================================================= */
