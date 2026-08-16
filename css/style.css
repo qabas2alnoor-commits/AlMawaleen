@@ -416,12 +416,6 @@ aside h2 {
    15. DAY NAMES
    ========================================================= */
 
-/*
-   مهم:
-   حجم اسم اليوم يتكيف تلقائيًا مع عرض الشاشة.
-   لا نعتمد على حجم ثابت للهاتف أو التابلت.
-*/
-
 .day-name {
     width: 100%;
     min-width: 0;
@@ -436,12 +430,6 @@ aside h2 {
 
     text-align: center;
 
-    /*
-       الحجم يتكيف تلقائيًا:
-       - لا يقل عن 7px
-       - يكبر مع الشاشة
-       - لا يتجاوز 12px
-    */
     font-size: clamp(7px, 1.8vw, 12px);
 
     font-weight: bold;
@@ -450,7 +438,7 @@ aside h2 {
 
     white-space: nowrap;
     overflow: hidden;
-    text-overflow: ellipsis;
+    text-overflow: clip;
 
     min-height: 29px;
 
@@ -1086,13 +1074,10 @@ body.dark-mode .detail-event {
         gap: 3px;
     }
 
-    /*
-       أسماء الأيام أصبحت تلقائية.
-       لا نضع font-size ثابت هنا.
-    */
     .day-name {
         padding: 6px 2px;
         min-height: 27px;
+        font-size: clamp(7px, 1.5vw, 11px);
     }
 
     #calendar .day,
@@ -1293,28 +1278,38 @@ body.dark-mode .detail-event {
     }
 
 
-    /*
-       أسماء الأيام:
-       حجم تلقائي حسب عرض الشاشة.
-       لا نستخدم حجمًا ثابتًا هنا.
-    */
+    /* =====================================================
+       DAY NAMES
+       ===================================================== */
 
     .day-name {
-        padding: 4px 1px;
+        padding: 3px 1px;
 
         min-height: 25px;
 
-        font-size: clamp(7px, 2vw, 11px);
+        font-size: clamp(6px, 1.8vw, 10px);
 
-        line-height: 1.15;
+        line-height: 1.1;
 
         white-space: nowrap;
 
         overflow: hidden;
 
-        text-overflow: ellipsis;
+        text-overflow: clip;
+
+        letter-spacing: -0.3px;
+
+        display: flex;
+
+        align-items: center;
+
+        justify-content: center;
     }
 
+
+    /* =====================================================
+       CALENDAR DAYS
+       ===================================================== */
 
     #calendar .day,
     .calendar-grid .day,
@@ -1421,17 +1416,18 @@ body.dark-mode .detail-event {
         max-height: 250px;
     }
 
-    /*
-       في الوضع الأفقي أيضًا نخلي أسماء الأيام
-       تتكيف مع عرض الخلية.
-    */
 
+    /* أسماء الأيام في العرض */
     .day-name {
         font-size: clamp(7px, 1.5vw, 11px);
 
         padding: 4px 2px;
 
         min-height: 25px;
+
+        line-height: 1.1;
+
+        letter-spacing: 0;
     }
 }
 
@@ -1489,19 +1485,26 @@ body.dark-mode .detail-event {
     }
 
 
-    /*
-       أصغر حجم للشاشات الصغيرة جدًا،
-       مع الحفاظ على القراءة وعدم خروج النص.
-    */
+    /* =====================================================
+       DAY NAMES - VERY SMALL PHONES
+       ===================================================== */
 
     .day-name {
-        font-size: clamp(7px, 2.3vw, 9px);
+        font-size: clamp(6px, 1.9vw, 8px);
 
-        padding: 3px 1px;
+        padding: 3px 0;
 
         min-height: 23px;
 
-        line-height: 1.1;
+        line-height: 1.05;
+
+        white-space: nowrap;
+
+        overflow: hidden;
+
+        text-overflow: clip;
+
+        letter-spacing: -0.4px;
     }
 
 
