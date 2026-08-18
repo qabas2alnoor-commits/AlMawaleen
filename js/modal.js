@@ -1,38 +1,318 @@
 // ============================================
 // modal.js
-// إدارة نافذة "حول التطبيق"
+// إدارة نوافذ التطبيق
+// مواقيت الولاء
 // ============================================
 
-document.addEventListener("DOMContentLoaded", function () {
+document.addEventListener(
+    "DOMContentLoaded",
+    initializeModals
+);
 
-    const aboutBtn = document.getElementById("aboutBtn");
-    const aboutModal = document.getElementById("aboutModal");
-    const closeAbout = document.getElementById("closeAbout");
 
-    if (!aboutBtn || !aboutModal) {
-        console.warn("نافذة حول التطبيق غير موجودة");
+// ============================================
+// تهيئة جميع النوافذ
+// ============================================
+
+function initializeModals() {
+
+    setupAboutModal();
+
+    setupDetailsModal();
+
+    setupEventModal();
+
+    setupEscapeKey();
+
+}
+
+
+// ============================================
+// نافذة حول التطبيق
+// ============================================
+
+function setupAboutModal() {
+
+    const aboutButton =
+        document.getElementById(
+            "aboutBtn"
+        );
+
+    const aboutModal =
+        document.getElementById(
+            "aboutModal"
+        );
+
+    const closeButton =
+        document.getElementById(
+            "closeAbout"
+        );
+
+    if (
+        !aboutButton ||
+        !aboutModal
+    ) {
+
         return;
+
     }
 
-    // فتح النافذة
-    aboutBtn.addEventListener("click", function () {
-        aboutModal.classList.add("show");
-    });
 
-    // إغلاق النافذة
-    if (closeAbout) {
-        closeAbout.addEventListener("click", function () {
-            aboutModal.classList.remove("show");
-        });
-    }
+    aboutButton.addEventListener(
+        "click",
+        () => {
 
-    // إغلاق عند الضغط خارج النافذة
-    aboutModal.addEventListener("click", function (event) {
+            aboutModal.classList.add(
+                "show"
+            );
 
-        if (event.target === aboutModal) {
-            aboutModal.classList.remove("show");
         }
+    );
 
-    });
 
-});
+    if (closeButton) {
+
+        closeButton.addEventListener(
+            "click",
+            () => {
+
+                closeAboutModal();
+
+            }
+        );
+
+    }
+
+
+    aboutModal.addEventListener(
+        "click",
+        event => {
+
+            if (
+                event.target === aboutModal
+            ) {
+
+                closeAboutModal();
+
+            }
+
+        }
+    );
+
+}
+
+
+// ============================================
+// إغلاق نافذة حول التطبيق
+// ============================================
+
+function closeAboutModal() {
+
+    const modal =
+        document.getElementById(
+            "aboutModal"
+        );
+
+    if (!modal) {
+
+        return;
+
+    }
+
+    modal.classList.remove(
+        "show"
+    );
+
+}
+
+
+// ============================================
+// نافذة تفاصيل اليوم
+// ============================================
+
+function setupDetailsModal() {
+
+    const modal =
+        document.getElementById(
+            "detailsModal"
+        );
+
+    const closeButton =
+        document.getElementById(
+            "closeDetails"
+        );
+
+    if (!modal) {
+
+        return;
+
+    }
+
+
+    if (closeButton) {
+
+        closeButton.addEventListener(
+            "click",
+            closeDetailsModal
+        );
+
+    }
+
+
+    modal.addEventListener(
+        "click",
+        event => {
+
+            if (
+                event.target === modal
+            ) {
+
+                closeDetailsModal();
+
+            }
+
+        }
+    );
+
+}
+
+
+// ============================================
+// إغلاق تفاصيل اليوم
+// ============================================
+
+function closeDetailsModal() {
+
+    const modal =
+        document.getElementById(
+            "detailsModal"
+        );
+
+    if (!modal) {
+
+        return;
+
+    }
+
+    modal.style.display =
+        "none";
+
+}
+
+
+// ============================================
+// نافذة إضافة / تعديل المناسبة
+// ============================================
+
+function setupEventModal() {
+
+    const modal =
+        document.getElementById(
+            "eventModal"
+        );
+
+    const closeButton =
+        document.getElementById(
+            "closeModal"
+        );
+
+    if (!modal) {
+
+        return;
+
+    }
+
+
+    if (closeButton) {
+
+        closeButton.addEventListener(
+            "click",
+            closeEventModal
+        );
+
+    }
+
+
+    modal.addEventListener(
+        "click",
+        event => {
+
+            if (
+                event.target === modal
+            ) {
+
+                closeEventModal();
+
+            }
+
+        }
+    );
+
+}
+
+
+// ============================================
+// إغلاق نافذة المناسبة
+// ============================================
+
+function closeEventModal() {
+
+    const modal =
+        document.getElementById(
+            "eventModal"
+        );
+
+    if (!modal) {
+
+        return;
+
+    }
+
+    modal.style.display =
+        "none";
+
+}
+
+
+// ============================================
+// ESC لإغلاق النوافذ
+// ============================================
+
+function setupEscapeKey() {
+
+    document.addEventListener(
+        "keydown",
+        event => {
+
+            if (
+                event.key !== "Escape"
+            ) {
+
+                return;
+
+            }
+
+            closeAboutModal();
+
+            closeDetailsModal();
+
+            closeEventModal();
+
+        }
+    );
+
+}
+
+
+// ============================================
+// الدوال العامة
+// ============================================
+
+window.closeAboutModal =
+    closeAboutModal;
+
+window.closeDetailsModal =
+    closeDetailsModal;
+
+window.closeEventModal =
+    closeEventModal;

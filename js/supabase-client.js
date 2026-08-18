@@ -1,146 +1,120 @@
-
 // ============================================
-// Supabase Client
+// supabase-client.js
+// اتصال Supabase
 // مواقيت الولاء
 // ============================================
-const supabaseClient = window.supabase.createClient(
-    SUPABASE_URL,
-    SUPABASE_ANON_KEY
-);
 
 
 // ============================================
-// المناسبات القادمة من Supabase
+// التحقق من إعدادات Supabase
 // ============================================
 
-let supabaseHijriEvents = [];
+if (
+    typeof SUPABASE_URL === "undefined" ||
+    typeof SUPABASE_ANON_KEY === "undefined"
+) {
+
+    console.error(
+        "خطأ: إعدادات Supabase غير موجودة."
+    );
+
+} else if (
+    typeof window.supabase === "undefined"
+) {
+
+    console.error(
+        "خطأ: مكتبة Supabase لم يتم تحميلها."
+    );
+
+} else {
+
+    // ========================================
+    // إنشاء عميل Supabase
+    // ========================================
+
+    const supabaseClient =
+        window.supabase.createClient(
+            SUPABASE_URL,
+            SUPABASE_ANON_KEY
+        );
 
 
-// ============================================
-// جلب المناسبات من Supabase
-// ============================================
+    // ========================================
+    // إتاحة العميل لجميع الملفات
+    // ========================================
 
-async function loadSupabaseEvents() {
-
-    try {
-
-        const { data, error } = await supabaseClient
-            .from("events")
-            .select("*")
-            .eq("is_active", true)
-            .order("hijri_month", { ascending: true })
-            .order("hijri_day", { ascending: true });
+    window.supabaseClient =
+        supabaseClient;
 
 
-        // ========================================
-        // معالجة الخطأ
-        // ========================================
+    console.log(
+        "Supabase Client تم تهيئته بنجاح."
+    );
 
-        if (error) {
+
+    // ========================================
+    // تحميل المناسبات من Supabase
+    // ========================================
+
+    async function loadSupabaseEvents() {
+
+        try {
+
+            const {
+                data,
+                error
+            } =
+                await supabaseClient
+                    .from("events")
+                    .select("*")
+                    .eq("is_active", true)
+                    .order(
+                        "hijri_month",
+                        {
+                            ascending: true
+                        }
+                    )
+                    .order(
+                        "hijri_day",
+                        {
+                            ascending: true
+                        }
+                    );
+
+            if (error) {
+
+                console.error(
+                    "خطأ تحميل المناسبات من Supabase:",
+                    error
+                );
+
+                return [];
+
+            }
+
+            return Array.isArray(data)
+                ? data
+                : [];
+
+        } catch (error) {
 
             console.error(
-                "خطأ في قراءة المناسبات من Supabase:",
+                "خطأ في الاتصال بـ Supabase:",
                 error
             );
-
-            supabaseHijriEvents = [];
 
             return [];
 
         }
 
-
-        // ========================================
-        // تحويل أعمدة Supabase إلى الشكل
-        // الذي يستخدمه التطبيق حاليًا
-        // ========================================
-
-        supabaseHijriEvents = (data || []).map(event => ({
-
-            id:
-                event.source_id ||
-                String(event.id),
-
-
-            month:
-                Number(event.hijri_month),
-
-
-            day:
-                Number(event.hijri_day),
-
-
-            title:
-                event.name,
-
-
-            type:
-                event.event_type,
-
-
-            description:
-                event.description || "",
-
-
-            importance:
-                Number(event.importance || 3),
-
-
-            color:
-                event.color || "#777",
-
-
-            // ========================================
-            // حالة تفعيل المناسبة
-            // ========================================
-
-            is_active:
-                event.is_active,
-
-
-            // ========================================
-            // العطلة الرسمية
-            // نحتفظ بالاسمين للتوافق مع
-            // جميع أجزاء التطبيق
-            // ========================================
-
-            isHoliday:
-                event.is_holiday,
-
-
-            is_holiday:
-                event.is_holiday
-
-        }));
-
-
-        // ========================================
-        // سجل عدد المناسبات المحملة
-        // ========================================
-
-      
-
-
-        // ========================================
-        // إرجاع المناسبات
-        // ========================================
-
-        return supabaseHijriEvents;
-
     }
 
 
-    catch (error) {
+    // ========================================
+    // جعل الدالة متاحة عالمياً
+    // ========================================
 
-        console.error(
-            "خطأ غير متوقع في تحميل المناسبات من Supabase:",
-            error
-        );
-
-        supabaseHijriEvents = [];
-
-        return [];
-
-    }
+    window.loadSupabaseEvents =
+        loadSupabaseEvents;
 
 }

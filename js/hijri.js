@@ -1,82 +1,73 @@
 // =====================================
-// Hijri Date - Imami Adjustment
+// hijri.js
+// Hijri Date - API Helper
+// مواقيت الولاء
 // =====================================
 
-// -1 = إنقاص يوم
-//  0 = بدون تعديل
-// +1 = إضافة يوم
 
+// =====================================
+// الحصول على التاريخ الهجري
+// لتاريخ ميلادي محدد
+//
+// ملاحظة:
+// لا يتم تطبيق hijri_offset هنا.
+//
+// التصحيح يتم في calendar.js
+// اعتمادًا على إعداد Supabase.
+// =====================================
 
-async function getHijriDate(year, month, day) {
+async function getHijriDate(
+    year,
+    month,
+    day
+) {
 
     try {
 
-        // =====================================
-        // إنشاء التاريخ الميلادي
-        // =====================================
+        // -------------------------------------
+        // JavaScript month = 0 - 11
+        // -------------------------------------
 
-        let date = new Date(
-            year,
-            month,
-            day
-        );
-
-
-        // =====================================
-        // تطبيق التصحيح الإمامي
-        // =====================================
-
-        const offset =
-            typeof IMAMI_HIJRI_OFFSET !== "undefined"
-                ? Number(IMAMI_HIJRI_OFFSET)
-                : 0;
+        const date =
+            new Date(
+                year,
+                month,
+                day
+            );
 
 
         if (
-            Number.isFinite(offset) &&
-            offset !== 0
+            Number.isNaN(
+                date.getTime()
+            )
         ) {
 
-            date.setDate(
-                date.getDate() + offset
-            );
+            return "";
 
         }
 
 
-        // =====================================
-        // تجهيز التاريخ لإرساله إلى API
-        // =====================================
-
-        let d =
+        const d =
             String(
                 date.getDate()
-            ).padStart(
-                2,
-                "0"
-            );
+            ).padStart(2, "0");
 
-
-        let m =
+        const m =
             String(
                 date.getMonth() + 1
-            ).padStart(
-                2,
-                "0"
-            );
+            ).padStart(2, "0");
 
-
-        let y =
+        const y =
             date.getFullYear();
 
 
-        // =====================================
-        // طلب التاريخ الهجري
-        // =====================================
+        // -------------------------------------
+        // API
+        // -------------------------------------
 
-        let response =
+        const response =
             await fetch(
-                `https://api.aladhan.com/v1/gToH?date=${d}-${m}-${y}`
+                `https://api.aladhan.com/v1/gToH?date=${d}-${m}-${y}&adjustment=0`
             );
 
 
@@ -91,12 +82,14 @@ async function getHijriDate(year, month, day) {
         }
 
 
-        let result =
+        const result =
             await response.json();
 
 
         if (
-            result.code !== 200
+            result.code !== 200 ||
+            !result.data ||
+            !result.data.hijri
         ) {
 
             return "";
@@ -104,36 +97,28 @@ async function getHijriDate(year, month, day) {
         }
 
 
-        // =====================================
-        // استخراج التاريخ الهجري
-        // =====================================
-
-        let hijri =
+        const hijri =
             result.data.hijri;
 
 
         return {
 
             day:
-                Number(
-                    hijri.day
-                ),
+                Number(hijri.day),
 
             month:
-                Number(
-                    hijri.month.number
-                ),
+                Number(hijri.month.number),
 
             year:
-                Number(
-                    hijri.year
-                ),
+                Number(hijri.year),
+
+            monthName:
+                hijri.month.ar || "",
 
             text:
                 `${hijri.day} ${hijri.month.ar} ${hijri.year}`
 
         };
-
 
     }
 
@@ -144,9 +129,16 @@ async function getHijriDate(year, month, day) {
             error
         );
 
-
         return "";
 
     }
 
 }
+
+
+// =====================================
+// الدالة العامة
+// =====================================
+
+window.getHijriDate =
+    getHijriDate;

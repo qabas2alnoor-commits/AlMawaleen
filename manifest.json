@@ -1,26 +1,33 @@
 {
-  "name": "مواقيت الولاء",
-  "short_name": "مواقيت الولاء",
-  "description": "تقويم هجري وميلادي لعرض المناسبات الإسلامية والعطلات الرسمية",
-  "lang": "ar",
-  "dir": "rtl",
-  "start_url": "./index.html",
-  "scope": "./",
-  "id": "/MawaqitAlWalaa/index.html",
-  "display": "standalone",
-  "background_color": "#064635",
-  "theme_color": "#064635",
-  "orientation": "portrait-primary",
-  "icons": [
-    {
-      "src": "assets/icons/icon-192.png",
-      "sizes": "192x192",
-      "type": "image/png"
-    },
-    {
-      "src": "assets/icons/icon-512.png",
-      "sizes": "512x512",
-      "type": "image/png"
-    }
-  ]
+    "name": "مواقيت الولاء",
+    "short_name": "مواقيت الولاء",
+    "description": "تقويم هجري وميلادي لعرض المناسبات الإسلامية والعطلات الرسمية",
+    "lang": "ar",
+    "dir": "rtl",
+
+    "start_url": "./index.html",
+    "scope": "./",
+    "id": "./",
+
+    "display": "standalone",
+
+    "background_color": "#064E3B",
+    "theme_color": "#064E3B",
+
+    "orientation": "any",
+
+    "icons": [
+        {
+            "src": "assets/icons/icon-192.png",
+            "sizes": "192x192",
+            "type": "image/png",
+            "purpose": "any"
+        },
+        {
+            "src": "assets/icons/icon-512.png",
+            "sizes": "512x512",
+            "type": "image/png",
+            "purpose": "any"
+        }
+    ]
 }

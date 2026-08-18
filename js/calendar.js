@@ -1,6 +1,6 @@
 // ============================================
 // calendar.js
-// التقويم الهجري + التاريخ الميلادي + المناسبات
+// التقويم الهجري + الميلادي + المناسبات
 // ============================================
 
 // ============================================
@@ -38,39 +38,21 @@ const dayNames = [
 ];
 
 // ============================================
-// التاريخ الحالي
+// حالة التقويم
 // ============================================
 
 let currentDate = new Date();
 
-let currentMonth =
-    currentDate.getMonth();
-
-let currentYear =
-    currentDate.getFullYear();
-
-// ============================================
-// الشهر الهجري الحالي
-// API:
-// محرم = 1
-// صفر = 2
-// ...
-// ذو الحجة = 12
-// ============================================
+let currentMonth = currentDate.getMonth();
+let currentYear = currentDate.getFullYear();
 
 let currentHijriMonth = null;
 let currentHijriYear = null;
 
-// ============================================
-// التاريخ الميلادي المرجعي للشهر الهجري
-// ============================================
-
-let hijriAnchorDate =
-    new Date(currentDate);
+let hijriAnchorDate = new Date(currentDate);
 
 // ============================================
-// Cache للتقويم الهجري
-// مفتاحه: السنة-الشهر الميلادي-offset
+// Cache
 // ============================================
 
 const hijriCalendarCache = new Map();
@@ -79,382 +61,280 @@ const hijriCalendarCache = new Map();
 // تشغيل التطبيق
 // ============================================
 
-
-document.addEventListener(
-    "DOMContentLoaded",
-    async () => {
-
-        try {
-
-            // ----------------------------------------
-            // تحميل المناسبات الإمامية
-            // ----------------------------------------
-
-            if (
-                typeof loadImamEvents === "function"
-            ) {
-
-                await loadImamEvents();
-
-            }
-
-            // ----------------------------------------
-            // تحميل المناسبات الجانبية
-            // ----------------------------------------
-
-            if (
-                typeof loadSidebarEvents === "function"
-            ) {
-
-                loadSidebarEvents();
-
-            }
-
-            // ----------------------------------------
-            // تحميل أحداث المستخدم
-            // ----------------------------------------
-
-            if (
-                typeof loadUserEvents === "function"
-            ) {
-
-                loadUserEvents();
-
-            }
-
-            // ----------------------------------------
-            // رسم التقويم
-            // ----------------------------------------
-
-            await renderCalendar();
-
-            // ----------------------------------------
-            // الوضع الليلي
-            // ----------------------------------------
-
-            setupDarkMode();
-
-            // ----------------------------------------
-            // حول التطبيق
-            // ----------------------------------------
-
-            setupAboutApp();
-
-            // ----------------------------------------
-            // إغلاق نافذة تفاصيل اليوم
-            // ----------------------------------------
-
-            setupDetailsModal();
-
+document.addEventListener("DOMContentLoaded", async () => {
+    try {
+        // تحميل إعداد تصحيح التاريخ الهجري
+        if (typeof loadHijriOffset === "function") {
+            await loadHijriOffset();
         }
 
-        catch (error) {
-
-            console.error(
-                "خطأ أثناء تشغيل التقويم:",
-                error
-            );
-
+        // تحميل المناسبات الإمامية
+        if (typeof loadImamEvents === "function") {
+            await loadImamEvents();
         }
 
+        // تحميل المناسبات الجانبية
+        if (typeof loadSidebarEvents === "function") {
+            loadSidebarEvents();
+        }
+
+        // تحميل مناسبات المستخدم
+        if (typeof loadUserEvents === "function") {
+            loadUserEvents();
+        }
+
+        // رسم التقويم
+        await renderCalendar();
+
+        // إعداد الوضع الليلي
+        setupDarkMode();
+
+        // إعداد نافذة حول التطبيق
+        setupAboutApp();
+
+        // إعداد نافذة تفاصيل اليوم
+        setupDetailsModal();
+
+    } catch (error) {
+        console.error("خطأ أثناء تشغيل التقويم:", error);
     }
-);
+});
+
 // ============================================
-// الحصول على عدد أيام الشهر الهجري
-// من البيانات الموجودة في Cache
+// عدد أيام الشهر الهجري الحقيقي
 // ============================================
 
-function getHijriMonthLength(
-    monthData,
-    hijriMonth,
-    hijriYear
-) {
-
+function getHijriMonthLength(monthData, hijriMonth, hijriYear) {
     if (!Array.isArray(monthData)) {
-        return 30;
+        return 0;
     }
 
-    const days =
-        monthData
-            .filter(item => {
+    const days = monthData
+        .filter(item =>
+            Number(item.hijriMonth) === Number(hijriMonth) &&
+            Number(item.hijriYear) === Number(hijriYear)
+        )
+        .map(item => Number(item.hijriDay))
+        .filter(Number.isFinite);
 
-                return (
-                    Number(item.hijriMonth) ===
-                        Number(hijriMonth) &&
+    return days.length ? Math.max(...days) : 0;
+}
 
-                    Number(item.hijriYear) ===
-                        Number(hijriYear)
-                );
+// ============================================
+// جلب بيانات الشهر الميلادي من API
+//
+// adjustment=0 دائمًا.
+// التصحيح يطبق محليًا من Supabase.
+// ============================================
 
-            })
-            .map(item =>
-                Number(item.hijriDay)
-            )
-            .filter(day =>
-                Number.isFinite(day)
+async function getHijriCalendarMonthRaw(month, year) {
+    const cacheKey =
+        `raw-${year}-${String(month + 1).padStart(2, "0")}`;
+
+    if (hijriCalendarCache.has(cacheKey)) {
+        return hijriCalendarCache.get(cacheKey);
+    }
+
+    try {
+        const apiMonth = month + 1;
+
+        const url =
+            `https://api.aladhan.com/v1/gToHCalendar/${apiMonth}/${year}?adjustment=0`;
+
+        const response = await fetch(url);
+
+        if (!response.ok) {
+            throw new Error(`HTTP ${response.status}`);
+        }
+
+        const result = await response.json();
+
+        if (!result.data || !Array.isArray(result.data)) {
+            throw new Error("بيانات التقويم الهجري غير متوفرة");
+        }
+
+        const monthData = result.data.map(item => {
+            const h = item.hijri;
+            const g = item.gregorian;
+
+            return {
+                gregorianDay: Number(g.day),
+                gregorianMonth: Number(g.month.number),
+                gregorianYear: Number(g.year),
+
+                hijriDay: Number(h.day),
+                hijriMonth: Number(h.month.number),
+
+                hijriMonthName:
+                    h.month.ar ||
+                    getHijriMonthName(Number(h.month.number)),
+
+                hijriYear: Number(h.year)
+            };
+        });
+
+        hijriCalendarCache.set(cacheKey, monthData);
+
+        return monthData;
+
+    } catch (error) {
+        console.error("خطأ تحميل بيانات API الهجرية:", error);
+        return [];
+    }
+}
+
+// ============================================
+// تطبيق تصحيح التاريخ الهجري
+//
+// -1 = تاريخ اليوم الهجري لليوم الميلادي السابق
+//  0 = بدون تعديل
+// +1 = تاريخ اليوم الهجري لليوم الميلادي التالي
+//
+// لا يتم تعديل رقم اليوم يدويًا.
+// يتم أخذ التاريخ الهجري الحقيقي من اليوم
+// الميلادي المقابل.
+// ============================================
+
+async function applyHijriOffsetToMonth(monthData, month, year) {
+    const offset =
+        typeof getHijriOffset === "function"
+            ? Number(getHijriOffset())
+            : 0;
+
+    const validOffset =
+        [-1, 0, 1].includes(offset)
+            ? offset
+            : 0;
+
+    if (
+        validOffset === 0 ||
+        !Array.isArray(monthData) ||
+        !monthData.length
+    ) {
+        return monthData;
+    }
+
+    let adjacentMonthData = [];
+
+    if (validOffset === -1) {
+        const previousDate = new Date(year, month - 1, 1);
+
+        adjacentMonthData =
+            await getHijriCalendarMonthRaw(
+                previousDate.getMonth(),
+                previousDate.getFullYear()
             );
-
-    if (days.length === 0) {
-        return 30;
     }
 
-    return Math.max(...days);
+    if (validOffset === 1) {
+        const nextDate = new Date(year, month + 1, 1);
+
+        adjacentMonthData =
+            await getHijriCalendarMonthRaw(
+                nextDate.getMonth(),
+                nextDate.getFullYear()
+            );
+    }
+
+    return monthData.map(item => {
+        const originalDate = new Date(
+            item.gregorianYear,
+            item.gregorianMonth - 1,
+            item.gregorianDay
+        );
+
+        const shiftedDate = new Date(originalDate);
+
+        shiftedDate.setDate(
+            shiftedDate.getDate() + validOffset
+        );
+
+        let sourceData = monthData;
+
+        const crossedMonth =
+            shiftedDate.getMonth() !== originalDate.getMonth() ||
+            shiftedDate.getFullYear() !== originalDate.getFullYear();
+
+        if (crossedMonth) {
+            sourceData = adjacentMonthData;
+        }
+
+        const corrected = sourceData.find(source =>
+            Number(source.gregorianYear) === shiftedDate.getFullYear() &&
+            Number(source.gregorianMonth) === shiftedDate.getMonth() + 1 &&
+            Number(source.gregorianDay) === shiftedDate.getDate()
+        );
+
+        if (!corrected) {
+            return item;
+        }
+
+        return {
+            ...item,
+
+            // التاريخ الميلادي يبقى كما هو
+            gregorianDay: item.gregorianDay,
+            gregorianMonth: item.gregorianMonth,
+            gregorianYear: item.gregorianYear,
+
+            // التعديل يطبق على الهجري فقط
+            hijriDay: corrected.hijriDay,
+            hijriMonth: corrected.hijriMonth,
+            hijriMonthName: corrected.hijriMonthName,
+            hijriYear: corrected.hijriYear
+        };
+    });
 }
 
 // ============================================
 // جلب التقويم الهجري لشهر ميلادي كامل
-// طلب API واحد فقط
 // ============================================
 
-async function getHijriCalendarMonth(
-    month,
-    year
-) {
+async function getHijriCalendarMonth(month, year) {
+    const offset =
+        typeof getHijriOffset === "function"
+            ? Number(getHijriOffset())
+            : 0;
 
-    // ========================================
-    // قراءة التصحيح الإمامي
-    // ========================================
-
-    let adjustment = 0;
-
-    if (
-        typeof IMAMI_HIJRI_OFFSET !== "undefined"
-    ) {
-
-        adjustment =
-            Number(IMAMI_HIJRI_OFFSET);
-
-        if (!Number.isFinite(adjustment)) {
-            adjustment = 0;
-        }
-
-    }
-
-    // ========================================
-    // Cache Key
-    // ========================================
+    const validOffset =
+        [-1, 0, 1].includes(offset)
+            ? offset
+            : 0;
 
     const cacheKey =
-        `${year}-${String(month + 1).padStart(2, "0")}-offset-${adjustment}`;
+        `${year}-${String(month + 1).padStart(2, "0")}-offset-${validOffset}`;
 
-    // ========================================
-    // استخدام Cache
-    // ========================================
+    if (hijriCalendarCache.has(cacheKey)) {
+        return hijriCalendarCache.get(cacheKey);
+    }
 
-    if (
-    hijriCalendarCache.has(cacheKey)
-) {
+    const rawData =
+        await getHijriCalendarMonthRaw(month, year);
 
-    
+    if (!rawData.length) {
+        return [];
+    }
 
-    return hijriCalendarCache.get(
-        cacheKey
+    const correctedData =
+        await applyHijriOffsetToMonth(
+            rawData,
+            month,
+            year
+        );
+
+    hijriCalendarCache.set(
+        cacheKey,
+        correctedData
     );
 
-}
-
-try {
-
-        // ====================================
-        // رقم الشهر الميلادي للـ API
-        // ====================================
-
-        const apiMonth =
-            month + 1;
-
-        // ====================================
-        // رابط API
-        // ====================================
-
-        const url =
-            "https://api.aladhan.com/v1/gToHCalendar/" +
-            apiMonth +
-            "/" +
-            year +
-            "?adjustment=0";
-
-        
-
-        // ====================================
-        // طلب API
-        // ====================================
-
-        const response =
-            await fetch(url);
-
-        if (!response.ok) {
-
-            throw new Error(
-                `HTTP ${response.status}`
-            );
-
-        }
-
-        // ====================================
-        // JSON
-        // ====================================
-
-        const result =
-            await response.json();
-
-        if (
-            !result.data ||
-            !Array.isArray(result.data)
-        ) {
-
-            throw new Error(
-                "بيانات التقويم الهجري غير متوفرة"
-            );
-
-        }
-
-        // ====================================
-        // تحويل البيانات
-        // ====================================
-
-        const monthData =
-            result.data.map(item => {
-
-                const h =
-                    item.hijri;
-
-                const g =
-                    item.gregorian;
-
-                return {
-
-                    gregorianDay:
-                        Number(g.day),
-
-                    gregorianMonth:
-                        Number(g.month.number),
-
-                    gregorianYear:
-                        Number(g.year),
-
-                    hijriDay:
-                        Number(h.day),
-
-                    hijriMonth:
-                        Number(h.month.number),
-
-                    hijriMonthName:
-                        h.month.ar,
-
-                    hijriYear:
-                        Number(h.year)
-
-                };
-
-            });
-
-        // ====================================
-        // التصحيح الإمامي
-        // ====================================
-
-        if (adjustment !== 0) {
-
-            monthData.forEach(item => {
-
-                item.hijriDay =
-                    Number(item.hijriDay) +
-                    adjustment;
-
-                // ----------------------------------
-                // إنقاص يوم
-                // ----------------------------------
-
-                if (
-                    item.hijriDay < 1
-                ) {
-
-                    item.hijriMonth--;
-
-                    if (
-                        item.hijriMonth < 1
-                    ) {
-
-                        item.hijriMonth = 12;
-                        item.hijriYear--;
-
-                    }
-
-                    item.hijriDay = 30;
-
-                }
-
-                // ----------------------------------
-                // إضافة يوم
-                // ----------------------------------
-
-                else if (
-                    item.hijriDay > 30
-                ) {
-
-                    item.hijriDay = 1;
-
-                    item.hijriMonth++;
-
-                    if (
-                        item.hijriMonth > 12
-                    ) {
-
-                        item.hijriMonth = 1;
-                        item.hijriYear++;
-
-                    }
-
-                }
-
-                // ----------------------------------
-                // تحديث اسم الشهر
-                // ----------------------------------
-
-                item.hijriMonthName =
-                    getHijriMonthName(
-                        item.hijriMonth
-                    );
-
-            });
-
-        }
-
-        // ====================================
-        // حفظ الشهر في Cache
-        // ====================================
-
-        hijriCalendarCache.set(
-            cacheKey,
-            monthData
-        );
-
-       
-
-       
-
-        return monthData;
-
-    }
-
-    catch (error) {
-
-        console.error(
-            "خطأ تحميل التقويم الهجري للشهر:",
-            error
-        );
-
-        return [];
-
-    }
+    return correctedData;
 }
 
 // ============================================
-// جلب بيانات الشهر الهجري المطلوب
-// ============================================
+// جلب بيانات شهر هجري كامل
 //
-// يتم جلب الشهر الميلادي الحالي + السابق + التالي
-// لأن الشهر الهجري قد يكون موزعًا بين شهرين ميلاديين.
-// والـ Cache يمنع إعادة الطلب.
+// الشهر الهجري قد يبدأ في نهاية شهر ميلادي
+// وينتهي في الشهر الميلادي التالي.
 // ============================================
 
 async function getHijriMonthData(
@@ -462,116 +342,59 @@ async function getHijriMonthData(
     hijriYear,
     anchorDate
 ) {
+    const anchor = new Date(anchorDate);
 
     const datesToLoad = [];
 
-    const anchor =
-        new Date(anchorDate);
-
-    // الشهر الحالي
-    datesToLoad.push(
-        new Date(
-            anchor.getFullYear(),
-            anchor.getMonth(),
-            1
-        )
-    );
-
-    // الشهر السابق
-    datesToLoad.push(
-        new Date(
-            anchor.getFullYear(),
-            anchor.getMonth() - 1,
-            1
-        )
-    );
-
-    // الشهر التالي
-    datesToLoad.push(
-        new Date(
-            anchor.getFullYear(),
-            anchor.getMonth() + 1,
-            1
-        )
-    );
-
-    let allData = [];
-
-    for (
-        const date of datesToLoad
-    ) {
-
-        const data =
-            await getHijriCalendarMonth(
-                date.getMonth(),
-                date.getFullYear()
-            );
-
-        if (
-            Array.isArray(data)
-        ) {
-
-            allData.push(
-                ...data
-            );
-
-        }
-
+    for (let offset = -3; offset <= 3; offset++) {
+        datesToLoad.push(
+            new Date(
+                anchor.getFullYear(),
+                anchor.getMonth() + offset,
+                1
+            )
+        );
     }
 
-    // ========================================
-    // حذف التكرار
-    // ========================================
+    // تحميل الأشهر بالتوازي بدلًا من الانتظار
+    // لكل طلب API بشكل منفصل.
+    const monthResults =
+        await Promise.all(
+            datesToLoad.map(date =>
+                getHijriCalendarMonth(
+                    date.getMonth(),
+                    date.getFullYear()
+                )
+            )
+        );
 
-    const uniqueData = [];
+    const allData =
+        monthResults.flat();
 
-    allData.forEach(item => {
+    // إزالة التكرار
+    const seenDates = new Set();
 
-        const exists =
-            uniqueData.some(existing => {
+    const uniqueData =
+        allData.filter(item => {
+            const key =
+                `${item.gregorianYear}-${item.gregorianMonth}-${item.gregorianDay}`;
 
-                return (
-                    Number(existing.gregorianDay) ===
-                        Number(item.gregorianDay) &&
+            if (seenDates.has(key)) {
+                return false;
+            }
 
-                    Number(existing.gregorianMonth) ===
-                        Number(item.gregorianMonth) &&
-
-                    Number(existing.gregorianYear) ===
-                        Number(item.gregorianYear)
-                );
-
-            });
-
-        if (!exists) {
-
-            uniqueData.push(item);
-
-        }
-
-    });
-
-    // ========================================
-    // اختيار الشهر الهجري المطلوب فقط
-    // ========================================
-
-    const result =
-        uniqueData.filter(item => {
-
-            return (
-                Number(item.hijriMonth) ===
-                    Number(hijriMonth) &&
-
-                Number(item.hijriYear) ===
-                    Number(hijriYear)
-            );
-
+            seenDates.add(key);
+            return true;
         });
 
-    // ========================================
-    // ترتيب الأيام هجريًا
-    // ========================================
+    // اختيار الشهر الهجري المطلوب
+    const result =
+        uniqueData.filter(item =>
+            Number(item.hijriMonth) === Number(hijriMonth) &&
+            Number(item.hijriYear) === Number(hijriYear)
+        );
 
+    // ترتيب الأيام هجريًا
     result.sort(
         (a, b) =>
             Number(a.hijriDay) -
@@ -585,23 +408,15 @@ async function getHijriMonthData(
 // البحث عن التاريخ الهجري ليوم ميلادي
 // ============================================
 
-function getHijriForGregorianDay(
-    monthData,
-    day
-) {
-
-    if (
-        !Array.isArray(monthData)
-    ) {
-
+function getHijriForGregorianDay(monthData, day) {
+    if (!Array.isArray(monthData)) {
         return null;
     }
 
     return (
         monthData.find(
             item =>
-                Number(item.gregorianDay) ===
-                Number(day)
+                Number(item.gregorianDay) === Number(day)
         ) || null
     );
 }
@@ -610,10 +425,7 @@ function getHijriForGregorianDay(
 // الحصول على تاريخ ميلادي من بيانات هجري
 // ============================================
 
-function getGregorianDateFromHijri(
-    hijri
-) {
-
+function getGregorianDateFromHijri(hijri) {
     if (!hijri) {
         return null;
     }
@@ -626,46 +438,31 @@ function getGregorianDateFromHijri(
 }
 
 // ============================================
-// تحديد الشهر الهجري الحالي عند البداية
+// تحديد الشهر الهجري الحالي
 // ============================================
 
 async function initializeHijriMonth() {
-
     if (
         currentHijriMonth !== null &&
         currentHijriYear !== null
     ) {
-
         return;
-
     }
 
-    const monthData =
+    const currentGregorianData =
         await getHijriCalendarMonth(
             currentDate.getMonth(),
             currentDate.getFullYear()
         );
 
     const todayHijri =
-        monthData.find(item => {
-
-            return (
-
-                Number(item.gregorianDay) ===
-                    currentDate.getDate() &&
-
-                Number(item.gregorianMonth) ===
-                    currentDate.getMonth() + 1 &&
-
-                Number(item.gregorianYear) ===
-                    currentDate.getFullYear()
-
-            );
-
-        });
+        currentGregorianData.find(item =>
+            Number(item.gregorianDay) === currentDate.getDate() &&
+            Number(item.gregorianMonth) === currentDate.getMonth() + 1 &&
+            Number(item.gregorianYear) === currentDate.getFullYear()
+        );
 
     if (todayHijri) {
-
         currentHijriMonth =
             Number(todayHijri.hijriMonth);
 
@@ -675,34 +472,48 @@ async function initializeHijriMonth() {
         hijriAnchorDate =
             new Date(currentDate);
 
+        return;
     }
 
+    // احتياط
+    const nearbyData =
+        await getHijriMonthData(
+            1,
+            1,
+            currentDate
+        );
+
+    const fallback =
+        nearbyData.find(item =>
+            Number(item.gregorianDay) === currentDate.getDate() &&
+            Number(item.gregorianMonth) === currentDate.getMonth() + 1 &&
+            Number(item.gregorianYear) === currentDate.getFullYear()
+        );
+
+    if (fallback) {
+        currentHijriMonth =
+            Number(fallback.hijriMonth);
+
+        currentHijriYear =
+            Number(fallback.hijriYear);
+
+        hijriAnchorDate =
+            new Date(currentDate);
+    }
 }
 
 // ============================================
-// رسم التقويم الهجري
+// رسم التقويم
 // ============================================
 
 async function renderCalendar() {
-
     const calendar =
-        document.getElementById(
-            "calendar"
-        );
+        document.getElementById("calendar");
 
     if (!calendar) {
-
-        console.error(
-            "لم يتم العثور على عنصر #calendar"
-        );
-
+        console.error("لم يتم العثور على عنصر #calendar");
         return;
-
     }
-
-    // ========================================
-    // تحديد الشهر الهجري عند التشغيل الأول
-    // ========================================
 
     await initializeHijriMonth();
 
@@ -710,51 +521,28 @@ async function renderCalendar() {
         currentHijriMonth === null ||
         currentHijriYear === null
     ) {
-
-        console.error(
-            "لم يتم تحديد الشهر الهجري الحالي"
-        );
-
+        console.error("لم يتم تحديد الشهر الهجري الحالي");
         return;
-
     }
-
-    // ========================================
-    // تنظيف التقويم القديم
-    // ========================================
 
     calendar.innerHTML = "";
 
-    // ========================================
-    // عنوان الشهر الهجري
-    // ========================================
-
+    // عنوان الشهر
     const monthYear =
-        document.getElementById(
-            "monthYear"
-        );
+        document.getElementById("monthYear");
 
     if (monthYear) {
-
         monthYear.textContent =
             `${getHijriMonthName(currentHijriMonth)} ${currentHijriYear} هـ`;
-
     }
 
-    // ========================================
-    // تاريخ اليوم الميلادي
-    // ========================================
-
-    const today =
-        new Date();
+    // التاريخ الميلادي الحالي
+    const today = new Date();
 
     const todayGregorian =
-        document.getElementById(
-            "todayGregorian"
-        );
+        document.getElementById("todayGregorian");
 
     if (todayGregorian) {
-
         todayGregorian.textContent =
             today.toLocaleDateString(
                 "ar-IQ",
@@ -765,13 +553,9 @@ async function renderCalendar() {
                     day: "numeric"
                 }
             );
-
     }
 
-    // ========================================
-    // تحميل بيانات الشهر الهجري
-    // ========================================
-
+    // بيانات الشهر الهجري
     let monthData =
         await getHijriMonthData(
             currentHijriMonth,
@@ -779,43 +563,24 @@ async function renderCalendar() {
             hijriAnchorDate
         );
 
-    // ========================================
-    // إذا لم نجد البيانات باستخدام المرجع
-    // نعيد المحاولة باستخدام التاريخ الحالي
-    // ========================================
-
-    if (
-        !monthData.length
-    ) {
-
+    if (!monthData.length) {
         monthData =
             await getHijriMonthData(
                 currentHijriMonth,
                 currentHijriYear,
                 new Date()
             );
-
     }
 
-    if (
-        !monthData ||
-        !monthData.length
-    ) {
-
+    if (!monthData.length) {
         console.error(
             "لم يتم العثور على أيام الشهر الهجري"
         );
-
         return;
-
     }
 
-    // ========================================
     // تحديث المرجع الميلادي
-    // ========================================
-
-    const firstHijriDay =
-        monthData[0];
+    const firstHijriDay = monthData[0];
 
     const firstGregorianDate =
         getGregorianDateFromHijri(
@@ -823,7 +588,6 @@ async function renderCalendar() {
         );
 
     if (firstGregorianDate) {
-
         hijriAnchorDate =
             new Date(firstGregorianDate);
 
@@ -832,13 +596,9 @@ async function renderCalendar() {
 
         currentYear =
             firstGregorianDate.getFullYear();
-
     }
 
-    // ========================================
-    // تحديث التاريخ الهجري لليوم الحالي
-    // ========================================
-
+    // التاريخ الهجري لليوم الحالي
     const todayMonthData =
         await getHijriCalendarMonth(
             today.getMonth(),
@@ -846,66 +606,32 @@ async function renderCalendar() {
         );
 
     const todayHijri =
-        todayMonthData.find(item => {
-
-            return (
-
-                Number(item.gregorianDay) ===
-                    today.getDate() &&
-
-                Number(item.gregorianMonth) ===
-                    today.getMonth() + 1 &&
-
-                Number(item.gregorianYear) ===
-                    today.getFullYear()
-
-            );
-
-        });
+        todayMonthData.find(item =>
+            Number(item.gregorianDay) === today.getDate() &&
+            Number(item.gregorianMonth) === today.getMonth() + 1 &&
+            Number(item.gregorianYear) === today.getFullYear()
+        );
 
     const todayHijriElement =
-        document.getElementById(
-            "todayHijri"
-        );
+        document.getElementById("todayHijri");
 
-    if (
-        todayHijriElement &&
-        todayHijri
-    ) {
-
+    if (todayHijriElement && todayHijri) {
         todayHijriElement.textContent =
             `${todayHijri.hijriDay} ${todayHijri.hijriMonthName} ${todayHijri.hijriYear} هـ`;
-
     }
 
-    // ========================================
-    // أسماء الأيام
-    // ========================================
-
+    // أسماء أيام الأسبوع
     dayNames.forEach(day => {
-
         const header =
-            document.createElement(
-                "div"
-            );
+            document.createElement("div");
 
-        header.className =
-            "day-name";
+        header.className = "day-name";
+        header.textContent = day;
 
-        header.textContent =
-            day;
-
-        calendar.appendChild(
-            header
-        );
-
+        calendar.appendChild(header);
     });
 
-    // ========================================
-    // أول يوم في الشهر الهجري
-    // نعتمد على موقعه الميلادي لمعرفة يوم الأسبوع
-    // ========================================
-
+    // تحديد مكان أول يوم
     const firstDayDate =
         getGregorianDateFromHijri(
             monthData[0]
@@ -916,107 +642,53 @@ async function renderCalendar() {
             ? firstDayDate.getDay()
             : 0;
 
-    // ========================================
     // الخانات الفارغة
-    // ========================================
-
-    for (
-        let i = 0;
-        i < firstDay;
-        i++
-    ) {
-
+    for (let i = 0; i < firstDay; i++) {
         const empty =
-            document.createElement(
-                "div"
-            );
+            document.createElement("div");
 
-        empty.className =
-            "empty";
+        empty.className = "empty";
 
-        calendar.appendChild(
-            empty
-        );
-
+        calendar.appendChild(empty);
     }
 
-    // ========================================
-    // إنشاء أيام الشهر الهجري
-    // ========================================
-
-    monthData.forEach(
-        hijriDayData => {
-
-            createDay(
-                hijriDayData,
-                calendar
-            );
-
-        }
-    );
-
-    // ========================================
-    // تحديث قسم المناسبات
-    // ========================================
-
-    if (
-        typeof showMonthEvents === "function"
-    ) {
-
-        showMonthEvents(
-            [
-                {
-                    month:
-                        currentHijriMonth,
-
-                    year:
-                        currentHijriYear
-                }
-            ]
+    // إنشاء أيام الشهر
+    monthData.forEach(hijriDayData => {
+        createDay(
+            hijriDayData,
+            calendar
         );
+    });
 
+    // تحديث المناسبات الجانبية
+    if (typeof showMonthEvents === "function") {
+        showMonthEvents([
+            {
+                month: currentHijriMonth,
+                year: currentHijriYear
+            }
+        ]);
     }
-
 }
 
 // ============================================
 // إنشاء يوم
 // ============================================
 
-function createDay(
-    hijri,
-    container
-) {
-
+function createDay(hijri, container) {
     const div =
-        document.createElement(
-            "div"
-        );
+        document.createElement("div");
 
-    div.className =
-        "calendar-day";
-
-    // ========================================
-    // التاريخ الميلادي لهذا اليوم
-    // ========================================
+    div.className = "calendar-day";
 
     const date =
-        getGregorianDateFromHijri(
-            hijri
-        );
-
-    // ========================================
-    // حماية
-    // ========================================
+        getGregorianDateFromHijri(hijri);
 
     if (!date) {
         return;
     }
 
-    // ========================================
     // المناسبات الإمامية
-    // ========================================
-
     let imamEvents = [];
 
     if (
@@ -1024,65 +696,35 @@ function createDay(
         hijri.hijriDay &&
         hijri.hijriMonth
     ) {
-
         imamEvents =
             getHijriEvents(
                 Number(hijri.hijriDay),
                 Number(hijri.hijriMonth)
             ) || [];
-
     }
 
-    // ========================================
     // مناسبات المستخدم
-    // تعتمد على التاريخ الميلادي
-    // ========================================
-
     let personalEvents = [];
 
     if (
         typeof userEvents !== "undefined" &&
         Array.isArray(userEvents)
     ) {
-
         personalEvents =
-            userEvents.filter(
-                event =>
-
-                    Number(event.day) ===
-                        date.getDate() &&
-
-                    Number(event.month) ===
-                        date.getMonth() + 1 &&
-
-                    Number(event.year) ===
-                        date.getFullYear()
+            userEvents.filter(event =>
+                Number(event.day) === date.getDate() &&
+                Number(event.month) === date.getMonth() + 1 &&
+                Number(event.year) === date.getFullYear()
             );
-
     }
 
-    // ========================================
-    // جميع المناسبات
-    // ========================================
-
     const allEvents = [
-
         ...imamEvents,
-
         ...personalEvents
-
     ];
 
-    // ========================================
     // محتوى اليوم
-    // ========================================
-    //
-    // الرقم الكبير = هجري
-    // الرقم الصغير = ميلادي
-    // ========================================
-
     div.innerHTML = `
-
         <div class="gregorian-day">
             ${hijri.hijriDay}
         </div>
@@ -1092,179 +734,88 @@ function createDay(
         </div>
 
         <div class="day-events"></div>
-
     `;
 
-    // ========================================
-    // المناسبات داخل اليوم
-    // ========================================
-
+    // عرض المناسبات
     const eventsBox =
-        div.querySelector(
-            ".day-events"
-        );
+        div.querySelector(".day-events");
 
     if (
         eventsBox &&
         allEvents.length
     ) {
-
         allEvents
             .slice(0, 2)
             .forEach(event => {
-
                 const item =
-                    document.createElement(
-                        "div"
-                    );
+                    document.createElement("div");
 
-                item.className =
-                    "mini-event";
+                item.className = "mini-event";
 
-                if (
+                item.textContent =
                     Number(event.importance) >= 5
-                ) {
+                        ? `⭐ ${event.title}`
+                        : `• ${event.title}`;
 
-                    item.textContent =
-                        `⭐ ${event.title}`;
-
-                }
-
-                else {
-
-                    item.textContent =
-                        `• ${event.title}`;
-
-                }
-
-                if (
-                    event.color
-                ) {
-
+                if (event.color) {
                     item.style.color =
                         event.color;
-
                 }
 
-                eventsBox.appendChild(
-                    item
-                );
-
+                eventsBox.appendChild(item);
             });
-
     }
 
-    // ========================================
-    // تلوين اليوم إذا كان فيه مناسبة
-    // ========================================
-
-    if (
-        allEvents.length
-    ) {
-
-        div.classList.add(
-            "has-event"
-        );
+    // تلوين اليوم حسب نوع المناسبة
+    if (allEvents.length) {
+        div.classList.add("has-event");
 
         const type =
             allEvents[0].type;
 
         if (
-
             type === "death" ||
-
             type === "martyrdom" ||
-
             type === "martyr"
-
         ) {
-
-            div.classList.add(
-                "death-event"
-            );
-
-        }
-
-        else if (
-
+            div.classList.add("death-event");
+        } else if (
             type === "birth" ||
-
             type === "marriage"
-
         ) {
-
-            div.classList.add(
-                "happy-event"
-            );
-
+            div.classList.add("happy-event");
         }
-
     }
 
-    // ========================================
     // اليوم الحالي
-    // ========================================
-
-    const today =
-        new Date();
+    const today = new Date();
 
     if (
-
-        date.getDate() ===
-            today.getDate() &&
-
-        date.getMonth() ===
-            today.getMonth() &&
-
-        date.getFullYear() ===
-            today.getFullYear()
-
+        date.getDate() === today.getDate() &&
+        date.getMonth() === today.getMonth() &&
+        date.getFullYear() === today.getFullYear()
     ) {
-
-        div.classList.add(
-            "today"
-        );
-
+        div.classList.add("today");
     }
 
-    // ========================================
     // الضغط على اليوم
-    // ========================================
-
-    div.onclick = () => {
-
+    div.addEventListener("click", () => {
         openDayDetails(
             date,
             hijri,
             allEvents
         );
+    });
 
-    };
-
-    // ========================================
-    // إضافة اليوم
-    // ========================================
-
-    container.appendChild(
-        div
-    );
-
+    container.appendChild(div);
 }
 
 // ============================================
 // التاريخ الهجري الإمامي
 // ============================================
-//
-// يستخدم نفس Cache.
-// لا يقوم بطلب API جديد إذا كان موجودًا.
-// ============================================
 
-async function getShiaCompatibleHijriDate(
-    date
-) {
-
+async function getShiaCompatibleHijriDate(date) {
     try {
-
         const monthData =
             await getHijriCalendarMonth(
                 date.getMonth(),
@@ -1278,76 +829,47 @@ async function getShiaCompatibleHijriDate(
             );
 
         if (!result) {
-
             return {
-
                 day: "",
                 month: "",
                 monthName: "",
                 year: ""
-
             };
-
         }
 
         return {
-
-            day:
-                result.hijriDay,
-
-            month:
-                result.hijriMonth,
-
-            monthName:
-                result.hijriMonthName,
-
-            year:
-                result.hijriYear
-
+            day: result.hijriDay,
+            month: result.hijriMonth,
+            monthName: result.hijriMonthName,
+            year: result.hijriYear
         };
 
-    }
-
-    catch (error) {
-
+    } catch (error) {
         console.error(
             "خطأ التاريخ الهجري:",
             error
         );
 
         return {
-
             day: "",
             month: "",
             monthName: "",
             year: ""
-
         };
-
     }
-
 }
 
 // ============================================
 // تفاصيل اليوم
 // ============================================
 
-
-
-function openDayDetails(
-    date,
-    hijri,
-    events
-) {
-
+function openDayDetails(date, hijri, events) {
     let html = `
-
         <h3>التاريخ الميلادي</h3>
 
         <p>
             ${date.getFullYear()}/${date.getMonth() + 1}/${date.getDate()}
         </p>
-
 
         <h3>التاريخ الهجري</h3>
 
@@ -1357,218 +879,105 @@ function openDayDetails(
             ${hijri.hijriYear || ""}
         </p>
 
-
         <h3>المناسبات</h3>
-
     `;
 
-
-    // ========================================
-    // لا توجد مناسبات
-    // ========================================
-
-    if (
-        !events ||
-        !events.length
-    ) {
-
+    if (!events || !events.length) {
         html += `
-
             <p class="no-events">
                 لا توجد مناسبات
             </p>
-
         `;
+    } else {
+        events.forEach(event => {
+            const isUserEvent =
+                typeof userEvents !== "undefined" &&
+                Array.isArray(userEvents) &&
+                userEvents.some(
+                    userEvent =>
+                        Number(userEvent.id) ===
+                        Number(event.id)
+                );
 
-    }
+            html += `
+                <div class="detail-event">
 
+                    <span>
+                        ${event.title}
+                    </span>
+            `;
 
-    // ========================================
-    // عرض المناسبات
-    // ========================================
-
-    else {
-
-        events.forEach(
-            event => {
-
-                // --------------------------------
-                // التحقق هل المناسبة من أحداث المستخدم
-                // --------------------------------
-
-                const isUserEvent =
-
-                    typeof userEvents !==
-                        "undefined"
-
-                    &&
-
-                    Array.isArray(
-                        userEvents
-                    )
-
-                    &&
-
-                    userEvents.some(
-                        userEvent =>
-
-                            Number(
-                                userEvent.id
-                            )
-
-                            ===
-
-                            Number(
-                                event.id
-                            )
-                    );
-
-
-                // ====================================
-                // بداية بطاقة المناسبة
-                // ====================================
-
+            // عطلة رسمية
+            if (
+                event.is_holiday === true ||
+                event.is_holiday === "true" ||
+                event.isHoliday === true ||
+                event.isHoliday === "true"
+            ) {
                 html += `
-
-                    <div class="detail-event">
-
-                        <span>
-                            ${event.title}
-                        </span>
-
-                `;
-
-
-                // ====================================
-                // عطلة رسمية
-                // ====================================
-                //
-                // القيمة القادمة من Supabase:
-                // is_holiday = true
-                //
-                // ====================================
-
-               if (
-    event.is_holiday === true ||
-    event.is_holiday === "true" ||
-    event.isHoliday === true ||
-    event.isHoliday === "true"
-) {
-
-    html += `
-
-        <div
-            class="official-holiday"
-            style="
-                display: block;
-                margin-top: 8px;
-                padding: 6px 10px;
-                font-weight: bold;
-                color: #C62828;
-            "
-        >
-            🟠 عطلة رسمية
-        </div>
-
-    `;
-
-}
-
-
-                // ====================================
-                // زر حذف مناسبة المستخدم
-                // ====================================
-
-                if (
-                    isUserEvent
-                ) {
-
-                    html += `
-
-                        <button
-                            type="button"
-                            class="delete-event-btn"
-                            onclick="deleteEventFromDetails(${event.id})"
-                        >
-                            حذف
-                        </button>
-
-                    `;
-
-                }
-
-
-                // ====================================
-                // إغلاق بطاقة المناسبة
-                // ====================================
-
-                html += `
-
+                    <div
+                        class="official-holiday"
+                        style="
+                            display: block;
+                            margin-top: 8px;
+                            padding: 6px 10px;
+                            font-weight: bold;
+                            color: #C62828;
+                        "
+                    >
+                        🟠 عطلة رسمية
                     </div>
-
                 `;
-
             }
-        );
 
+            // حذف مناسبة المستخدم
+            if (isUserEvent) {
+                html += `
+                    <button
+                        type="button"
+                        class="delete-event-btn"
+                        onclick="deleteEventFromDetails(${event.id})"
+                    >
+                        حذف
+                    </button>
+                `;
+            }
+
+            html += `
+                </div>
+            `;
+        });
     }
-
-
-    // ========================================
-    // عرض المحتوى داخل نافذة التفاصيل
-    // ========================================
 
     const detailsContent =
         document.getElementById(
             "detailsContent"
         );
 
-
     const detailsModal =
         document.getElementById(
             "detailsModal"
         );
 
-
-    if (
-        detailsContent
-    ) {
-
-        detailsContent.innerHTML =
-            html;
-
+    if (detailsContent) {
+        detailsContent.innerHTML = html;
     }
 
-
-    if (
-        detailsModal
-    ) {
-
-        detailsModal.style.display =
-            "flex";
-
+    if (detailsModal) {
+        detailsModal.style.display = "flex";
     }
-
 }
 
 // ============================================
-// حذف حدث المستخدم من نافذة التفاصيل
+// حذف مناسبة المستخدم
 // ============================================
 
-function deleteEventFromDetails(
-    id
-) {
-
-    if (
-        typeof deleteEvent !== "function"
-    ) {
-
+function deleteEventFromDetails(id) {
+    if (typeof deleteEvent !== "function") {
         console.error(
             "دالة deleteEvent غير موجودة"
         );
-
         return;
-
     }
 
     deleteEvent(id);
@@ -1579,55 +988,29 @@ function deleteEventFromDetails(
         );
 
     if (modal) {
-
-        modal.style.display =
-            "none";
-
+        modal.style.display = "none";
     }
 
-    // إعادة رسم التقويم بعد الحذف
-
     renderCalendar();
-
 }
 
 // ============================================
-// إنشاء نجوم الأهمية
+// نجوم الأهمية
 // ============================================
 
-function createImportanceStars(
-    level
-) {
-
-    if (
-        !level ||
-        level <= 0
-    ) {
-
+function createImportanceStars(level) {
+    if (!level || level <= 0) {
         return "";
-
     }
 
-    let stars = "";
-
-    for (
-        let i = 0;
-        i < level;
-        i++
-    ) {
-
-        stars += "⭐";
-
-    }
+    const stars =
+        "⭐".repeat(Number(level));
 
     return `
-
         <div class="event-importance">
             ${stars}
         </div>
-
     `;
-
 }
 
 // ============================================
@@ -1635,19 +1018,12 @@ function createImportanceStars(
 // ============================================
 
 async function nextMonth() {
-
     if (
         currentHijriMonth === null ||
         currentHijriYear === null
     ) {
-
         await initializeHijriMonth();
-
     }
-
-    // ========================================
-    // حفظ آخر يوم من الشهر الحالي
-    // ========================================
 
     const currentData =
         await getHijriMonthData(
@@ -1656,14 +1032,9 @@ async function nextMonth() {
             hijriAnchorDate
         );
 
-    if (
-        currentData.length
-    ) {
-
+    if (currentData.length) {
         const lastDay =
-            currentData[
-                currentData.length - 1
-            ];
+            currentData[currentData.length - 1];
 
         const lastDate =
             getGregorianDateFromHijri(
@@ -1671,36 +1042,23 @@ async function nextMonth() {
             );
 
         if (lastDate) {
-
             hijriAnchorDate =
                 new Date(lastDate);
 
             hijriAnchorDate.setDate(
-                hijriAnchorDate.getDate() + 5
+                hijriAnchorDate.getDate() + 1
             );
-
         }
-
     }
-
-    // ========================================
-    // الانتقال للشهر الهجري التالي
-    // ========================================
 
     currentHijriMonth++;
 
-    if (
-        currentHijriMonth > 12
-    ) {
-
+    if (currentHijriMonth > 12) {
         currentHijriMonth = 1;
-
         currentHijriYear++;
-
     }
 
     await renderCalendar();
-
 }
 
 // ============================================
@@ -1708,19 +1066,12 @@ async function nextMonth() {
 // ============================================
 
 async function previousMonth() {
-
     if (
         currentHijriMonth === null ||
         currentHijriYear === null
     ) {
-
         await initializeHijriMonth();
-
     }
-
-    // ========================================
-    // بيانات الشهر الحالي
-    // ========================================
 
     const currentData =
         await getHijriMonthData(
@@ -1729,10 +1080,7 @@ async function previousMonth() {
             hijriAnchorDate
         );
 
-    if (
-        currentData.length
-    ) {
-
+    if (currentData.length) {
         const firstDay =
             currentData[0];
 
@@ -1742,36 +1090,23 @@ async function previousMonth() {
             );
 
         if (firstDate) {
-
             hijriAnchorDate =
                 new Date(firstDate);
 
             hijriAnchorDate.setDate(
-                hijriAnchorDate.getDate() - 5
+                hijriAnchorDate.getDate() - 1
             );
-
         }
-
     }
-
-    // ========================================
-    // الانتقال للشهر الهجري السابق
-    // ========================================
 
     currentHijriMonth--;
 
-    if (
-        currentHijriMonth < 1
-    ) {
-
+    if (currentHijriMonth < 1) {
         currentHijriMonth = 12;
-
         currentHijriYear--;
-
     }
 
     await renderCalendar();
-
 }
 
 // ============================================
@@ -1779,126 +1114,70 @@ async function previousMonth() {
 // ============================================
 
 function setupDarkMode() {
-
     const darkModeBtn =
         document.getElementById(
             "darkModeBtn"
         );
 
-    // ----------------------------------------
     // استعادة الوضع المحفوظ
-    // ----------------------------------------
-
     if (
-        localStorage.getItem("theme") ===
-        "dark"
+        localStorage.getItem("theme") === "dark"
     ) {
-
         document.body.classList.add(
             "dark-mode"
         );
+    }
 
+    if (!darkModeBtn) {
+        return;
     }
 
     if (
-        !darkModeBtn
+        darkModeBtn.dataset.ready === "true"
     ) {
-
         return;
-
     }
 
-    // منع تكرار الربط
-
-    if (
-        darkModeBtn.dataset.ready ===
-        "true"
-    ) {
-
-        return;
-
-    }
-
-    darkModeBtn.dataset.ready =
-        "true";
+    darkModeBtn.dataset.ready = "true";
 
     darkModeBtn.addEventListener(
         "click",
         () => {
-
-            document.body.classList.toggle(
-                "dark-mode"
-            );
-
-            if (
-                document.body.classList.contains(
+            const isDark =
+                document.body.classList.toggle(
                     "dark-mode"
-                )
-            ) {
-
-                localStorage.setItem(
-                    "theme",
-                    "dark"
                 );
 
-            }
-
-            else {
-
-                localStorage.setItem(
-                    "theme",
-                    "light"
-                );
-
-            }
-
+            localStorage.setItem(
+                "theme",
+                isDark ? "dark" : "light"
+            );
         }
     );
-
 }
 
 // ============================================
-// اسم الشهر الهجري بالعربي
+// أسماء الأشهر الهجرية
 // ============================================
 
-function getHijriMonthName(
-    month
-) {
-
+function getHijriMonthName(month) {
     const hijriMonths = [
-
         "",
-
         "محرم",
-
         "صفر",
-
         "ربيع الأول",
-
         "ربيع الآخر",
-
         "جمادى الأولى",
-
         "جمادى الآخرة",
-
         "رجب",
-
         "شعبان",
-
         "رمضان",
-
         "شوال",
-
         "ذو القعدة",
-
         "ذو الحجة"
-
     ];
 
-    return (
-        hijriMonths[month] || ""
-    );
-
+    return hijriMonths[Number(month)] || "";
 }
 
 // ============================================
@@ -1906,225 +1185,77 @@ function getHijriMonthName(
 // ============================================
 
 function setupAboutApp() {
+    const aboutButton =
+        document.getElementById("aboutBtn");
 
-    // ----------------------------------------
-    // البحث عن زر حول التطبيق
-    // ----------------------------------------
+    const aboutModal =
+        document.getElementById("aboutModal");
 
-    let aboutButton =
-        document.getElementById(
-            "aboutBtn"
-        );
-
-    if (!aboutButton) {
-
-        aboutButton =
-            document.getElementById(
-                "aboutAppBtn"
-            );
-
-    }
-
-    if (!aboutButton) {
-
+    if (!aboutButton || !aboutModal) {
         return;
-
     }
-
-    // ----------------------------------------
-    // منع تكرار الربط
-    // ----------------------------------------
 
     if (
-        aboutButton.dataset.aboutReady ===
-        "true"
+        aboutButton.dataset.aboutReady === "true"
     ) {
-
         return;
-
     }
 
-    aboutButton.dataset.aboutReady =
-        "true";
-
-    // ----------------------------------------
-    // النقر على زر حول التطبيق
-    // ----------------------------------------
+    aboutButton.dataset.aboutReady = "true";
 
     aboutButton.addEventListener(
         "click",
         openAboutApp
     );
 
-    // ----------------------------------------
-    // إذا كانت نافذة About موجودة في HTML
-    // ----------------------------------------
+    const closeAbout =
+        document.getElementById("closeAbout");
 
-    const aboutModal =
-        document.getElementById(
-            "aboutAppModal"
-        );
-
-    if (aboutModal) {
-
-        const closeAbout =
-            document.getElementById(
-                "closeAbout"
-            );
-
-        const closeAboutApp =
-            document.getElementById(
-                "closeAboutApp"
-            );
-
-        if (closeAbout) {
-
-            closeAbout.addEventListener(
-                "click",
-                () => {
-
-                    aboutModal.style.display =
-                        "none";
-
-                }
-            );
-
-        }
-
-        if (closeAboutApp) {
-
-            closeAboutApp.addEventListener(
-                "click",
-                () => {
-
-                    aboutModal.style.display =
-                        "none";
-
-                }
-            );
-
-        }
-
-        // ------------------------------------
-        // الضغط خارج النافذة
-        // ------------------------------------
-
-        aboutModal.addEventListener(
+    if (closeAbout) {
+        closeAbout.addEventListener(
             "click",
-            event => {
-
-                if (
-                    event.target === aboutModal
-                ) {
-
-                    aboutModal.style.display =
-                        "none";
-
-                }
-
-            }
+            closeAboutApp
         );
-
     }
 
+    aboutModal.addEventListener(
+        "click",
+        event => {
+            if (event.target === aboutModal) {
+                closeAboutApp();
+            }
+        }
+    );
 }
 
 // ============================================
-// فتح نافذة حول التطبيق
+// فتح حول التطبيق
 // ============================================
 
 function openAboutApp() {
-
-    let modal =
+    const aboutModal =
         document.getElementById(
-            "aboutAppModal"
+            "aboutModal"
         );
 
-    // ========================================
-    // إذا كانت النافذة موجودة في HTML
-    // ========================================
-
-    if (modal) {
-
-        modal.style.display =
-            "flex";
-
-        return;
-
+    if (aboutModal) {
+        aboutModal.style.display = "flex";
     }
+}
 
-    // ========================================
-    // إنشاء نافذة About إذا لم تكن موجودة
-    // ========================================
+// ============================================
+// إغلاق حول التطبيق
+// ============================================
 
-    modal =
-        document.createElement(
-            "div"
-        );
-
-    modal.id =
-        "aboutAppModal";
-
-    modal.className =
-        "about-app-modal";
-
-    
-
-
-    document.body.appendChild(
-        modal
-    );
-
-    // ========================================
-    // إظهار النافذة
-    // ========================================
-
-    modal.style.display =
-        "flex";
-
-    // ========================================
-    // زر الإغلاق
-    // ========================================
-
-    const closeButton =
+function closeAboutApp() {
+    const aboutModal =
         document.getElementById(
-            "closeAboutApp"
+            "aboutModal"
         );
 
-    if (closeButton) {
-
-        closeButton.addEventListener(
-            "click",
-            () => {
-
-                modal.style.display =
-                    "none";
-
-            }
-        );
-
+    if (aboutModal) {
+        aboutModal.style.display = "none";
     }
-
-    // ========================================
-    // الضغط خارج النافذة
-    // ========================================
-
-    modal.addEventListener(
-        "click",
-        event => {
-
-            if (
-                event.target === modal
-            ) {
-
-                modal.style.display =
-                    "none";
-
-            }
-
-        }
-    );
-
 }
 
 // ============================================
@@ -2132,7 +1263,6 @@ function openAboutApp() {
 // ============================================
 
 function setupDetailsModal() {
-
     const detailsModal =
         document.getElementById(
             "detailsModal"
@@ -2143,55 +1273,37 @@ function setupDetailsModal() {
             "closeDetails"
         );
 
-    if (
-        closeDetails &&
-        detailsModal
-    ) {
-
-        if (
-            closeDetails.dataset.ready ===
-            "true"
-        ) {
-
-            return;
-
-        }
-
-        closeDetails.dataset.ready =
-            "true";
-
-        closeDetails.addEventListener(
-            "click",
-            () => {
-
-                detailsModal.style.display =
-                    "none";
-
-            }
-        );
-
-        detailsModal.addEventListener(
-            "click",
-            event => {
-
-                if (
-                    event.target === detailsModal
-                ) {
-
-                    detailsModal.style.display =
-                        "none";
-
-                }
-
-            }
-        );
-
+    if (!detailsModal || !closeDetails) {
+        return;
     }
 
+    if (
+        closeDetails.dataset.ready === "true"
+    ) {
+        return;
+    }
+
+    closeDetails.dataset.ready = "true";
+
+    closeDetails.addEventListener(
+        "click",
+        () => {
+            detailsModal.style.display = "none";
+        }
+    );
+
+    detailsModal.addEventListener(
+        "click",
+        event => {
+            if (event.target === detailsModal) {
+                detailsModal.style.display = "none";
+            }
+        }
+    );
 }
 
 // ============================================
-// إتاحة الدوال العامة للـ HTML
+// الدوال العامة
 // ============================================
 
 window.nextMonth =
@@ -2214,3 +1326,6 @@ window.renderCalendar =
 
 window.openAboutApp =
     openAboutApp;
+
+window.closeAboutApp =
+    closeAboutApp;

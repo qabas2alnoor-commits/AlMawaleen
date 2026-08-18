@@ -3,90 +3,145 @@
 
 <head>
 
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta charset="UTF-8">
 
-  <!-- PWA Manifest -->
-  <link rel="manifest" href="manifest.json">
+    <meta
+        name="viewport"
+        content="width=device-width, initial-scale=1.0"
+    >
 
-  <title>مواقيت الولاء </title>
+    <!-- ============================================
+         PWA
+    ============================================ -->
 
-  <!-- Favicon -->
-  <link rel="icon" type="image/png" href="favicon.png">
+    <link
+        rel="manifest"
+        href="manifest.json"
+    >
 
-  <!-- Google Font -->
-  <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@300;400;600;700&display=swap" rel="stylesheet">
+    <meta
+        name="theme-color"
+        content="#123b2a"
+    >
 
-  <!-- Font Awesome -->
-  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.7.2/css/all.min.css">
 
-  <!-- CSS -->
-  <link rel="stylesheet" href="css/style.css">
+    <!-- ============================================
+         عنوان التطبيق
+    ============================================ -->
+
+    <title>مواقيت الولاء</title>
+
+
+    <!-- ============================================
+         Favicon
+    ============================================ -->
+
+    <link
+        rel="icon"
+        type="image/png"
+        href="favicon.png"
+    >
+
+
+    <!-- ============================================
+         Google Font
+    ============================================ -->
+
+    <link
+        href="https://fonts.googleapis.com/css2?family=Cairo:wght@300;400;600;700&display=swap"
+        rel="stylesheet"
+    >
+
+
+    <!-- ============================================
+         Font Awesome
+    ============================================ -->
+
+    <link
+        rel="stylesheet"
+        href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.7.2/css/all.min.css"
+    >
+
+
+    <!-- ============================================
+         CSS
+    ============================================ -->
+
+    <link
+        rel="stylesheet"
+        href="css/style.css"
+    >
 
 </head>
-
 
 
 <body>
 
 
-    <!-- ================= HEADER ================= -->
-
+    <!-- ============================================
+         HEADER
+    ============================================ -->
 
     <header>
-
 
         <h1>
 
             <i class="fa-solid fa-calendar-days"></i>
 
-            مواقيت الولاء للمناسبات الدينية 
+            مواقيت الولاء للمناسبات الدينية
+
         </h1>
 
 
+        <div class="top-buttons">
 
-      <div class="top-buttons">
+            <button
+                type="button"
+                id="aboutBtn"
+            >
 
-    <button id="aboutBtn">
-    <i class="fa-solid fa-circle-info"></i>
-    حول التطبيق
-</button>
+                <i class="fa-solid fa-circle-info"></i>
 
-    <button id="darkModeBtn">
+                حول التطبيق
 
-        <i class="fa-solid fa-moon"></i>
+            </button>
 
-        الوضع الليلي
 
-    </button>
+            <button
+                type="button"
+                id="darkModeBtn"
+            >
 
-</div>
+                <i class="fa-solid fa-moon"></i>
 
+                الوضع الليلي
+
+            </button>
+
+        </div>
 
     </header>
 
 
-
-
-
-    <!-- ================= MAIN ================= -->
-
+    <!-- ============================================
+         MAIN
+    ============================================ -->
 
     <main>
 
 
-
-        <!-- Sidebar -->
-
+        <!-- ========================================
+             SIDEBAR
+        ========================================= -->
 
         <aside>
 
-            <h2>المناسبات📅</h2>
+            <h2>
+                المناسبات 📅
+            </h2>
 
-        
+
             <div class="events-panel">
-
-
 
                 <div id="month-events-list"></div>
 
@@ -95,25 +150,38 @@
         </aside>
 
 
-
-
-
-        <!-- ================= CALENDAR ================= -->
-
+        <!-- ========================================
+             CALENDAR
+        ========================================= -->
 
         <section class="calendar">
 
 
+            <div
+                id="calendarHeader"
+                class="calendar-header"
+            >
 
-            <div id="calendarHeader" class="calendar-header">
 
-                <button class="nav-btn" onclick="previousMonth()">
+                <!-- الشهر السابق -->
+
+                <button
+                    type="button"
+                    class="nav-btn"
+                    onclick="previousMonth()"
+                    aria-label="الشهر السابق"
+                    title="الشهر السابق"
+                >
                     ▶
                 </button>
+
+
+                <!-- معلومات الشهر -->
 
                 <div class="header-center">
 
                     <h2 id="monthYear"></h2>
+
 
                     <div class="today-info">
 
@@ -125,198 +193,315 @@
 
                 </div>
 
-                <button class="nav-btn" onclick="nextMonth()">
+
+                <!-- الشهر التالي -->
+
+                <button
+                    type="button"
+                    class="nav-btn"
+                    onclick="nextMonth()"
+                    aria-label="الشهر التالي"
+                    title="الشهر التالي"
+                >
                     ◀
                 </button>
 
             </div>
 
 
+            <!-- شبكة التقويم -->
 
-
-
-            <div id="calendar" class="calendar-grid">
-
-            </div>
-
-
+            <div
+                id="calendar"
+                class="calendar-grid"
+            ></div>
 
         </section>
-
-
 
     </main>
 
 
+    <!-- ============================================
+         DAY DETAILS MODAL
+    ============================================ -->
 
-
-
-
-
-
-
-
-
-
-
-
-    
-
-
-    <!-- ================= DAY DETAILS ================= -->
-
-
-    <div id="detailsModal" class="modal">
-
+    <div
+        id="detailsModal"
+        class="modal"
+    >
 
         <div class="modal-content">
 
 
-            <span id="closeDetails">
-
+            <button
+                type="button"
+                id="closeDetails"
+                class="modal-close"
+                aria-label="إغلاق"
+                title="إغلاق"
+            >
                 &times;
+            </button>
 
-            </span>
 
+            <h2>
+                تفاصيل اليوم
+            </h2>
+
+
+            <div id="detailsContent"></div>
+
+        </div>
+
+    </div>
+
+
+    <!-- ============================================
+         ABOUT APP MODAL
+    ============================================ -->
+
+    <div
+        id="aboutModal"
+        class="modal"
+    >
+
+        <div class="modal-content about-content">
+
+
+            <button
+                type="button"
+                id="closeAbout"
+                class="modal-close"
+                aria-label="إغلاق"
+                title="إغلاق"
+            >
+                &times;
+            </button>
 
 
             <h2>
 
-                تفاصيل اليوم
+                <i class="fa-solid fa-circle-info"></i>
+
+                مواقيت الولاء
 
             </h2>
 
 
+            <div class="about-body">
 
-            <div id="detailsContent">
+
+                <h3>
+                    تطبيق مواقيت الولاء الهجري والميلادي
+                </h3>
+
+
+                <p>
+                    تابع التواريخ اليومية، ومناسبات أهل البيت
+                    (عليهم السلام)، والعطل الرسمية والوطنية
+                    في مكان واحد وبواجهة عصريّة.
+                </p>
+
+
+                <!-- ====================================
+                     مميزات التطبيق
+                ==================================== -->
+
+                <div class="about-features">
+
+
+                    <div>
+
+                        <i class="fa-solid fa-calendar"></i>
+
+                        <span>
+                            التقويم الهجري
+                        </span>
+
+                    </div>
+
+
+                    <div>
+
+                        <i class="fa-solid fa-moon"></i>
+
+                        <span>
+                            التقويم الميلادي
+                        </span>
+
+                    </div>
+
+
+                    <div>
+
+                        <i class="fa-solid fa-star"></i>
+
+                        <span>
+                            مناسبات أهل البيت عليهم السلام
+                        </span>
+
+                    </div>
+
+
+                    <div>
+
+                        <i class="fa-solid fa-circle-check"></i>
+
+                        <span>
+                            العطل الرسمية والوطنية
+                        </span>
+
+                    </div>
+
+
+                </div>
+
+
+                <!-- ====================================
+                     معلومات التطبيق
+                ==================================== -->
+
+                <div class="about-footer">
+
+
+                    <img
+                        src="assets/icons/qabas-alnoor.png"
+                        alt="قبس النور"
+                        class="about-logo"
+                    >
+
+
+                    <span>
+                        الإصدار 1.0
+                    </span>
+
+
+                    <span>
+                        © 2026
+                    </span>
+
+
+                </div>
 
             </div>
-
-
 
         </div>
 
-
     </div>
 
 
-
-<!-- ================= ABOUT MODAL ================= -->
-
-
-<!-- ================= ABOUT APP ================= -->
-
-<div id="aboutModal" class="modal">
-
-    <div class="modal-content about-content">
-
-        <span id="closeAbout">
-            &times;
-        </span>
-
-        <h2>
-            <i class="fa-solid fa-circle-info"></i>
-            حول التطبيق
-        </h2>
-
-        <div class="about-body">
-
-            <h3>
-                التقويم الميلادي والهجري لأهل البيت عليهم السلام
-            </h3>
-
-            <p>
-                تطبيق لعرض التاريخ الميلادي والهجري
-                مع المناسبات الدينية.
-            </p>
-
-            <p>
-                يساعد التطبيق على متابعة التواريخ والمناسبات
-                المهمة بطريقة بسيطة ومنظمة.
-            </p>
-
-            <div class="about-features">
-
-                <div>
-                    <i class="fa-solid fa-calendar"></i>
-                    <span>التقويم الميلادي</span>
-                </div>
-
-                <div>
-                    <i class="fa-solid fa-moon"></i>
-                    <span>التقويم الهجري</span>
-                </div>
-
-                <div>
-                    <i class="fa-solid fa-star"></i>
-                    <span>مناسبات أهل البيت عليهم السلام</span>
-                </div>
-
-                <div>
-                    <i class="fa-solid fa-circle-check"></i>
-                    <span>تفاصيل الأيام</span>
-                </div>
-
-            </div>
-
-            <div class="about-footer">
-
-                <span>الإصدار 1.0</span>
-
-                <span>© 2026</span>
-
-                <span>*نور البرمجة*</span>
-
-                <span>LP</span>
-
-            </div>
-
-        </div>
-
-    </div>
-    </div>
+    <!-- ============================================
+         JAVASCRIPT
+    ============================================ -->
 
 
+    <!-- ============================================
+         Supabase Library
+         يتم تحميلها مرة واحدة فقط
+    ============================================ -->
+
+    <script
+        src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"
+    ></script>
 
 
-    <!-- ================= JAVASCRIPT ================= -->
+    <!-- ============================================
+         Supabase Configuration
+    ============================================ -->
 
-<!-- ================= JAVASCRIPT ================= -->
+    <script src="js/supabase-config.js"></script>
 
-<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 
-<script src="js/supabase-config.js"></script>
-<script src="js/supabase-client.js"></script>
+    <!-- ============================================
+         Supabase Client
+    ============================================ -->
 
-<script src="js/hijri-events.js" defer></script>
-<script src="js/sidebar.js" defer></script>
+    <script src="js/supabase-client.js"></script>
 
-<script src="js/events.js" defer></script>
-<script src="js/modal.js" defer></script>
-<script src="js/details.js" defer></script>
-<script src="js/hijri.js" defer></script>
-<script src="js/hijri-settings.js" defer></script>
-<script src="js/calendar.js" defer></script>
-<script>
-  if ("serviceWorker" in navigator) {
-    window.addEventListener("load", () => {
-      navigator.serviceWorker
-        .register("./service-worker.js")
-        .then((registration) => {
-          console.log(
-            "Service Worker registered:",
-            registration.scope
-          );
-        })
-        .catch((error) => {
-          console.error(
-            "Service Worker registration failed:",
-            error
-          );
-        });
-    });
-  }
-</script>
+
+    <!-- ============================================
+         Hijri Settings
+         يعتمد على Supabase
+    ============================================ -->
+
+    <script
+        src="js/hijri-settings.js"
+        defer
+    ></script>
+
+
+   
+
+
+    <!-- ============================================
+         Hijri Events
+         يعتمد على Supabase
+    ============================================ -->
+
+    <script
+        src="js/hijri-events.js"
+        defer
+    ></script>
+
+     <!-- ============================================
+         Hijri Date Helper
+    ============================================ -->
+
+    <script
+        src="js/hijri.js"
+        defer
+    ></script>
+
+
+    <!-- ============================================
+         User Events
+    ============================================ -->
+
+    <script
+        src="js/events.js"
+        defer
+    ></script>
+
+
+    <!-- ============================================
+         Modals
+    ============================================ -->
+
+    <script
+        src="js/modal.js"
+        defer
+    ></script>
+
+
+    <!-- ============================================
+         Day Details
+    ============================================ -->
+
+    <script
+        src="js/details.js"
+        defer
+    ></script>
+
+
+    <!-- ============================================
+         Sidebar
+    ============================================ -->
+
+    <script
+        src="js/sidebar.js"
+        defer
+    ></script>
+
+
+    <!-- ============================================
+         Main Calendar
+         يجب أن يكون آخر ملف
+    ============================================ -->
+
+    <script
+        src="js/calendar.js"
+        defer
+    ></script>
 
 
 </body>

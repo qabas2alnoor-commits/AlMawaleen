@@ -1,223 +1,128 @@
 // ============================================
 // hijri-events.js
-// ربط المناسبات الهجرية بالتقويم
+// المناسبات الهجرية
+// المصدر الوحيد: Supabase
+// مواقيت الولاء
 // ============================================
+//
+// نظام الأشهر:
+//
+// calendar.js:
+// محرم = 1
+// صفر = 2
+// ...
+// ذو الحجة = 12
+//
+// Supabase:
+// محرم = 0
+// صفر = 1
+// ...
+// ذو الحجة = 11
+//
+// هذا الملف مسؤول عن:
+// 1. تحميل المناسبات من Supabase.
+// 2. تحويل نظام الأشهر.
+// 3. توفير المناسبات لـ calendar.js.
+//
+// لا يغير التاريخ الهجري.
+// لا يغير طول الأشهر.
+// لا يطبق hijri_offset.
+// ============================================
+
 
 let loadedHijriEvents = [];
 
 
 // ============================================
-// تحويل رقم شهر API إلى رقم شهر المناسبات
-// ============================================
-//
-// API:
-// محرم = 1
-// صفر = 2
-// ربيع الأول = 3
-// ...
-// ذو الحجة = 12
-//
-// داخل التطبيق / Supabase:
-// محرم = 0
-// صفر = 1
-// ربيع الأول = 2
-// ...
-// ذو الحجة = 11
+// التحقق من شهر Supabase
+// 0 - 11
 // ============================================
 
 function normalizeHijriMonth(month) {
 
-    const value = Number(month);
+    const value =
+        Number(month);
 
-    if (!Number.isFinite(value)) {
+    if (
+        !Number.isInteger(value) ||
+        value < 0 ||
+        value > 11
+    ) {
+
         return null;
+
     }
 
-    // API = 1 - 12
-    if (value >= 1 && value <= 12) {
-        return value - 1;
-    }
+    return value;
 
-    // التطبيق = 0 - 11
-    if (value >= 0 && value <= 11) {
-        return value;
-    }
-
-    return null;
 }
 
 
 // ============================================
-// توحيد بيانات المناسبة القادمة من Supabase
+// تحويل شهر التقويم
+// 1 - 12
+// إلى نظام Supabase
+// 0 - 11
+// ============================================
+
+function calendarHijriMonthToInternal(month) {
+
+    const value =
+        Number(month);
+
+    if (
+        !Number.isInteger(value) ||
+        value < 1 ||
+        value > 12
+    ) {
+
+        return null;
+
+    }
+
+    return value - 1;
+
+}
+
+
+// ============================================
+// تحويل مناسبة Supabase
+// إلى الشكل الداخلي
 // ============================================
 
 function normalizeSupabaseEvent(event) {
 
     if (!event) {
+
         return null;
+
     }
 
+    const day =
+        Number(event.hijri_day);
 
-    // ========================================
-    // اليوم
-    // ========================================
-
-    const day = Number(
-        event.day ??
-        event.hijri_day ??
-        0
-    );
-
+    const month =
+        normalizeHijriMonth(
+            event.hijri_month
+        );
 
     if (
-        !Number.isFinite(day) ||
-        day <= 0
+        !Number.isInteger(day) ||
+        day < 1 ||
+        month === null
     ) {
+
         return null;
-    }
-
-
-    // ========================================
-    // الشهر
-    // ========================================
-
-    let month = null;
-
-
-    // Supabase
-    // hijri_month = 0 - 11
-
-    if (
-        event.hijri_month !== undefined &&
-        event.hijri_month !== null
-    ) {
-
-        const value =
-            Number(event.hijri_month);
-
-        if (
-            Number.isFinite(value) &&
-            value >= 0 &&
-            value <= 11
-        ) {
-
-            month = value;
-        }
-    }
-
-
-    // ========================================
-    // fallback إلى month
-    // ========================================
-
-    if (
-        month === null &&
-        event.month !== undefined &&
-        event.month !== null
-    ) {
-
-        const value =
-            Number(event.month);
-
-        if (
-            Number.isFinite(value)
-        ) {
-
-            // داخلي
-            if (
-                value >= 0 &&
-                value <= 11
-            ) {
-
-                month = value;
-            }
-
-            // API
-            else if (
-                value >= 1 &&
-                value <= 12
-            ) {
-
-                month = value - 1;
-            }
-        }
-    }
-
-
-    if (month === null) {
-        return null;
-    }
-
-
-    // ========================================
-    // نوع المناسبة
-    // ========================================
-
-    const type =
-        event.type ??
-        event.event_type ??
-        "";
-
-
-    // ========================================
-    // اسم المناسبة
-    // ========================================
-
-    const title =
-        event.title ??
-        event.name ??
-        "مناسبة";
-
-
-    // ========================================
-    // العطلة الرسمية
-    // ========================================
-
-    let isHoliday =
-        event.is_holiday ??
-        event.isHoliday ??
-        false;
-
-
-    if (
-        typeof isHoliday === "string"
-    ) {
-
-        const normalized =
-            isHoliday
-                .trim()
-                .toLowerCase();
-
-        isHoliday =
-            normalized === "true" ||
-            normalized === "1" ||
-            normalized === "yes";
 
     }
 
-    else if (
-        isHoliday === 1
-    ) {
-
-        isHoliday = true;
-
-    }
-
-    else {
-
-        isHoliday =
-            isHoliday === true;
-
-    }
-
-
-    // ========================================
-    // إنشاء نسخة موحدة
-    // ========================================
+    const isHoliday =
+        event.is_holiday === true ||
+        event.is_holiday === "true" ||
+        event.is_holiday === 1 ||
+        event.is_holiday === "1";
 
     return {
-
-        ...event,
 
         id:
             event.id,
@@ -229,16 +134,36 @@ function normalizeSupabaseEvent(event) {
             month,
 
         title:
-            title,
+            event.name ||
+            "مناسبة",
 
         type:
-            type,
+            event.event_type ||
+            "other",
+
+        description:
+            event.description ||
+            "",
+
+        importance:
+            Number(event.importance) || 0,
+
+        color:
+            event.color ||
+            "#777777",
 
         is_holiday:
             isHoliday,
 
         isHoliday:
-            isHoliday
+            isHoliday,
+
+        source_id:
+            event.source_id ||
+            null,
+
+        is_active:
+            event.is_active !== false
 
     };
 
@@ -249,22 +174,114 @@ function normalizeSupabaseEvent(event) {
 // تحميل المناسبات من Supabase
 // ============================================
 
+async function loadSupabaseEvents() {
+
+    // ----------------------------------------
+    // التأكد من وجود Supabase Client
+    // ----------------------------------------
+
+    if (
+        !window.supabaseClient
+    ) {
+
+        console.error(
+            "Supabase Client غير متوفر."
+        );
+
+        return [];
+
+    }
+
+    try {
+
+        const {
+            data,
+            error
+        } =
+            await window.supabaseClient
+                .from("events")
+                .select("*")
+                .eq("is_active", true)
+                .order(
+                    "hijri_month",
+                    {
+                        ascending: true
+                    }
+                )
+                .order(
+                    "hijri_day",
+                    {
+                        ascending: true
+                    }
+                );
+
+        // ------------------------------------
+        // معالجة خطأ Supabase
+        // ------------------------------------
+
+        if (error) {
+
+            console.error(
+                "خطأ Supabase أثناء تحميل المناسبات:",
+                error
+            );
+
+            return [];
+
+        }
+
+        // ------------------------------------
+        // التأكد من البيانات
+        // ------------------------------------
+
+        if (
+            !Array.isArray(data)
+        ) {
+
+            console.warn(
+                "لم يتم العثور على مناسبات في Supabase."
+            );
+
+            return [];
+
+        }
+
+        console.log(
+            `تم جلب ${data.length} مناسبة من Supabase.`
+        );
+
+        return data;
+
+    }
+
+    catch (error) {
+
+        console.error(
+            "خطأ أثناء الاتصال بـ Supabase:",
+            error
+        );
+
+        return [];
+
+    }
+
+}
+
+
+// ============================================
+// تحميل المناسبات الإمامية
+// ============================================
+
 async function loadImamEvents() {
 
     try {
 
-        // ------------------------------------
-        // التأكد من وجود دالة Supabase
-        // ------------------------------------
+        const events =
+            await loadSupabaseEvents();
 
         if (
-            typeof loadSupabaseEvents !==
-            "function"
+            !Array.isArray(events)
         ) {
-
-            console.error(
-                "loadSupabaseEvents غير موجودة"
-            );
 
             loadedHijriEvents = [];
 
@@ -272,75 +289,14 @@ async function loadImamEvents() {
 
         }
 
+        loadedHijriEvents =
+            events
+                .map(normalizeSupabaseEvent)
+                .filter(Boolean);
 
-        // ------------------------------------
-        // تحميل البيانات
-        // ------------------------------------
-
-        const supabaseEvents =
-            await loadSupabaseEvents();
-
-
-        // ------------------------------------
-        // توحيد البيانات
-        // ------------------------------------
-
-        if (
-            !Array.isArray(
-                supabaseEvents
-            )
-        ) {
-
-            loadedHijriEvents = [];
-
-        }
-
-        else {
-
-            loadedHijriEvents =
-                supabaseEvents
-                    .map(
-                        normalizeSupabaseEvent
-                    )
-                    .filter(
-                        event =>
-                            event !== null
-                    );
-        }
-
-
-        // ------------------------------------
-        // Console
-        // ------------------------------------
-
-      
-
-
-        // ------------------------------------
-        // فحص العطلات
-        // ------------------------------------
-
-        const holidays =
-            loadedHijriEvents.filter(
-                event =>
-                    event.is_holiday === true
-            );
-
-
-        
-
-        // ------------------------------------
-        // تحديث القائمة الجانبية
-        // ------------------------------------
-
-        if (
-            typeof loadSidebarEvents ===
-            "function"
-        ) {
-
-            loadSidebarEvents();
-        }
-
+        console.log(
+            `تم تحميل ${loadedHijriEvents.length} مناسبة هجرية من Supabase.`
+        );
 
         return loadedHijriEvents;
 
@@ -349,7 +305,7 @@ async function loadImamEvents() {
     catch (error) {
 
         console.error(
-            "خطأ تحميل المناسبات من Supabase:",
+            "خطأ تحميل المناسبات الهجرية:",
             error
         );
 
@@ -363,7 +319,7 @@ async function loadImamEvents() {
 
 
 // ============================================
-// جلب مناسبات يوم هجري معين
+// الحصول على مناسبات يوم هجري
 // ============================================
 
 function getHijriEvents(
@@ -371,44 +327,38 @@ function getHijriEvents(
     hijriMonth
 ) {
 
-    const normalizedMonth =
-        normalizeHijriMonth(
+    const day =
+        Number(hijriDay);
+
+    const month =
+        calendarHijriMonthToInternal(
             hijriMonth
         );
 
-
     if (
-        normalizedMonth === null
+        !Number.isInteger(day) ||
+        day < 1 ||
+        month === null
     ) {
 
         return [];
 
     }
 
-
     return loadedHijriEvents.filter(
-        event => {
+        event =>
 
-            return (
+            Number(event.day) === day &&
 
-                Number(event.day) ===
-                Number(hijriDay)
+            Number(event.month) === month
 
-                &&
-
-                Number(event.month) ===
-                Number(normalizedMonth)
-
-            );
-
-        }
     );
 
 }
 
 
 // ============================================
-// إضافة المناسبات إلى اليوم في التقويم
+// إضافة مؤشر المناسبة إلى اليوم
 // ============================================
 
 function attachHijriEvents(
@@ -418,9 +368,10 @@ function attachHijriEvents(
 ) {
 
     if (!dayElement) {
-        return;
-    }
 
+        return;
+
+    }
 
     const events =
         getHijriEvents(
@@ -428,55 +379,35 @@ function attachHijriEvents(
             hijriMonth
         );
 
-
-    if (
-        events.length === 0
-    ) {
+    if (!events.length) {
 
         return;
+
     }
-
-
-    // ========================================
-    // إضافة class
-    // ========================================
 
     dayElement.classList.add(
         "has-event"
     );
 
-
-    // ========================================
-    // حفظ البيانات
-    // ========================================
-
     dayElement.dataset.events =
         JSON.stringify(events);
 
-
-    // ========================================
-    // لون المناسبة
-    // ========================================
-
-    const event =
+    const firstEvent =
         events[0];
 
+    const color =
+        firstEvent.color ||
+        "#777777";
 
-    if (
-        event.color
-    ) {
+    dayElement.style.borderColor =
+        color;
 
-        dayElement.style.borderColor =
-            event.color;
+    dayElement.style.background =
+        `${color}22`;
 
-        dayElement.style.background =
-            event.color + "22";
-    }
-
-
-    // ========================================
-    // منع إضافة أكثر من نقطة
-    // ========================================
+    // ----------------------------------------
+    // منع إضافة المؤشر أكثر من مرة
+    // ----------------------------------------
 
     if (
         dayElement.querySelector(
@@ -485,66 +416,51 @@ function attachHijriEvents(
     ) {
 
         return;
+
     }
 
-
-    // ========================================
-    // إضافة نقطة المناسبة
-    // ========================================
-
-    const icon =
+    const dot =
         document.createElement(
             "span"
         );
 
-
-    icon.className =
+    dot.className =
         "event-dot";
 
-
-    icon.style.background =
-        event.color ||
-        "#777";
-
+    dot.style.background =
+        color;
 
     dayElement.appendChild(
-        icon
+        dot
     );
 
 }
 
 
 // ============================================
-// عرض تفاصيل المناسبة
+// عرض تفاصيل المناسبات
 // ============================================
 
-function showHijriEvents(
-    events
-) {
+function showHijriEvents(events) {
 
     if (
-        !events ||
-        events.length === 0
+        !Array.isArray(events) ||
+        !events.length
     ) {
 
         return "";
 
     }
 
+    return events
+        .map(event => {
 
-    let text = "";
+            const color =
+                event.color ||
+                "#777777";
 
-
-    events.forEach(
-        event => {
-
-            const isHoliday =
-                event.is_holiday === true ||
-                event.isHoliday === true;
-
-
-            const holidayText =
-                isHoliday
+            const holiday =
+                event.is_holiday === true
                     ? `
                         <p class="event-holiday">
                             🟠 عطلة رسمية
@@ -552,62 +468,94 @@ function showHijriEvents(
                       `
                     : "";
 
+            const description =
+                event.description
+                    ? `
+                        <p>
+                            ${event.description}
+                        </p>
+                      `
+                    : "";
 
-            text += `
-
-                <div class="event-item">
+            return `
+                <div
+                    class="event-item"
+                    style="border-right: 4px solid ${color};"
+                >
 
                     <h4>
-                        ${
-                            event.title ??
-                            event.name ??
-                            "مناسبة"
-                        }
+                        ${event.title || "مناسبة"}
                     </h4>
 
-                    <p>
-                        النوع:
-                        ${
-                            event.type ??
-                            event.event_type ??
-                            ""
-                        }
-                    </p>
+                    ${description}
 
-                    ${holidayText}
+                    ${holiday}
 
                 </div>
-
             `;
 
-        }
-    );
-
-
-    return text;
+        })
+        .join("");
 
 }
 
 
 // ============================================
-// إتاحة الدوال عالميًا
+// اسم الشهر الهجري
+// للنظام الداخلي 0 - 11
 // ============================================
+
+function getInternalHijriMonthName(month) {
+
+    const months = [
+
+        "محرم",
+        "صفر",
+        "ربيع الأول",
+        "ربيع الآخر",
+        "جمادى الأولى",
+        "جمادى الآخرة",
+        "رجب",
+        "شعبان",
+        "رمضان",
+        "شوال",
+        "ذو القعدة",
+        "ذو الحجة"
+
+    ];
+
+    return (
+        months[Number(month)] ||
+        ""
+    );
+
+}
+
+
+// ============================================
+// الدوال العامة
+// ============================================
+
+window.loadSupabaseEvents =
+    loadSupabaseEvents;
 
 window.loadImamEvents =
     loadImamEvents;
 
-
 window.getHijriEvents =
     getHijriEvents;
-
 
 window.attachHijriEvents =
     attachHijriEvents;
 
-
 window.showHijriEvents =
     showHijriEvents;
 
-
 window.normalizeHijriMonth =
     normalizeHijriMonth;
+
+window.calendarHijriMonthToInternal =
+    calendarHijriMonthToInternal;
+
+window.getInternalHijriMonthName =
+    getInternalHijriMonthName;

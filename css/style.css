@@ -954,10 +954,9 @@ aside h2 {
 }
 
 .about-features div {
-    padding: 12px;
+    padding: 8px 10px;
 
     display: flex;
-
     align-items: center;
 
     gap: 8px;
@@ -966,7 +965,7 @@ aside h2 {
 
     color: var(--green-dark);
 
-    border-radius: 10px;
+    border-radius: 8px;
 }
 
 .about-features i {
@@ -1094,7 +1093,48 @@ body.dark-mode .about-features div {
 body.dark-mode .detail-event {
     background: #12352B;
 }
+/* =========================================================
+   DARK MODE - EVENTS
+   ========================================================= */
 
+body.dark-mode .event {
+    background: #12352B;
+    color: #F8F5EA;
+}
+
+/* المناسبات العادية */
+body.dark-mode .event:not(.birth):not(.death):not(.martyr) {
+    color: #F8F5EA;
+}
+
+/* الولادات */
+body.dark-mode .event.birth {
+    background: #12352B;
+    color: #7FD6A8;
+}
+
+/* الوفيات */
+body.dark-mode .event.death {
+    background: #3A2020;
+    color: #FF8A8A;
+}
+
+/* الشهادة */
+body.dark-mode .event.martyr {
+    background: #3A2020;
+    color: #FF8A8A;
+}
+
+/* نص المناسبة */
+body.dark-mode .event .sidebar-event-title,
+body.dark-mode .event .sidebar-event-day {
+    color: inherit;
+}
+
+/* العطلة الرسمية تبقى واضحة بالأحمر */
+body.dark-mode .sidebar-holiday {
+    color: #FF6B6B !important;
+}
 
 /* =========================================================
    30. TABLET
@@ -1559,6 +1599,26 @@ body.dark-mode .detail-event {
     .events-panel {
         max-height: 285px;
     }
+}
+
+
+/* =========================================================
+   small icon an about logo
+   ========================================================= */
+  .about-footer {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 18px;
+    flex-wrap: nowrap;
+}
+
+.about-logo {
+    width: 100px;
+    height: 100px;
+    object-fit: contain;
+    display: block;
+    border-radius: 8px;
 }
 
 

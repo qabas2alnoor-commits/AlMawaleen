@@ -1,12 +1,13 @@
 // ============================================
 // sidebar.js
 // قائمة المناسبات الجانبية
+// مواقيت الولاء
 // ============================================
 
 
 // ============================================
 // أسماء الأشهر الهجرية
-// النظام الداخلي: 0 - 11
+// النظام الداخلي للقائمة: 0 - 11
 // ============================================
 
 const sidebarHijriMonths = [
@@ -28,24 +29,30 @@ const sidebarHijriMonths = [
 
 
 // ============================================
-// متغير لحفظ آخر شهر تم عرضه
+// آخر شهر تم عرضه
 // ============================================
 
 let lastSidebarHijriMonth = null;
-
 let lastSidebarHijriYear = null;
 
 
 // ============================================
 // الحصول على الشهر الهجري الحالي
+//
+// calendar.js:
+// 1 = محرم
+// 2 = صفر
+// ...
+// 12 = ذو الحجة
+//
+// Sidebar:
+// 0 = محرم
+// 1 = صفر
+// ...
+// 11 = ذو الحجة
 // ============================================
 
 function getSidebarCurrentHijriMonth() {
-
-    // ----------------------------------------
-    // الطريقة الأولى
-    // currentHijriMonth
-    // ----------------------------------------
 
     if (
         typeof currentHijriMonth !== "undefined" &&
@@ -55,14 +62,9 @@ function getSidebarCurrentHijriMonth() {
         const value =
             Number(currentHijriMonth);
 
-
         if (
             Number.isFinite(value)
         ) {
-
-            // API:
-            // 1 = محرم
-            // 12 = ذو الحجة
 
             if (
                 value >= 1 &&
@@ -72,10 +74,6 @@ function getSidebarCurrentHijriMonth() {
                 return value - 1;
 
             }
-
-            // النظام الداخلي:
-            // 0 = محرم
-            // 11 = ذو الحجة
 
             if (
                 value >= 0 &&
@@ -90,11 +88,6 @@ function getSidebarCurrentHijriMonth() {
 
     }
 
-
-    // ----------------------------------------
-    // الطريقة الثانية
-    // currentHijriDate
-    // ----------------------------------------
 
     if (
         typeof currentHijriDate !== "undefined" &&
@@ -108,12 +101,9 @@ function getSidebarCurrentHijriMonth() {
                 currentHijriDate.hijri_month
             );
 
-
         if (
             Number.isFinite(value)
         ) {
-
-            // API 1 - 12
 
             if (
                 value >= 1 &&
@@ -123,8 +113,6 @@ function getSidebarCurrentHijriMonth() {
                 return value - 1;
 
             }
-
-            // داخلي 0 - 11
 
             if (
                 value >= 0 &&
@@ -138,7 +126,6 @@ function getSidebarCurrentHijriMonth() {
         }
 
     }
-
 
     return null;
 
@@ -158,7 +145,6 @@ function getSidebarCurrentHijriYear() {
 
         const value =
             Number(currentHijriYear);
-
 
         if (
             Number.isFinite(value)
@@ -183,7 +169,6 @@ function getSidebarCurrentHijriYear() {
                 currentHijriDate.hijri_year
             );
 
-
         if (
             Number.isFinite(value)
         ) {
@@ -193,7 +178,6 @@ function getSidebarCurrentHijriYear() {
         }
 
     }
-
 
     return null;
 
@@ -210,14 +194,12 @@ function getSidebarEventDay(event) {
         return 0;
     }
 
-
     const day =
         Number(
             event.day ??
             event.hijri_day ??
             0
         );
-
 
     return Number.isFinite(day)
         ? day
@@ -228,6 +210,11 @@ function getSidebarEventDay(event) {
 
 // ============================================
 // الحصول على شهر المناسبة
+//
+// Supabase:
+// 0 = محرم
+// ...
+// 11 = ذو الحجة
 // ============================================
 
 function getSidebarEventMonth(event) {
@@ -236,13 +223,11 @@ function getSidebarEventMonth(event) {
         return null;
     }
 
-
     const value =
         Number(
             event.month ??
             event.hijri_month
         );
-
 
     if (
         !Number.isFinite(value)
@@ -252,17 +237,7 @@ function getSidebarEventMonth(event) {
 
     }
 
-
-    // ========================================
-    // مهم:
-    //
-    // loadedHijriEvents القادمة من
-    // hijri-events.js أصبحت بالفعل
-    // بنظام 0 - 11.
-    //
-    // لذلك لا نقوم بتحويلها مرة أخرى.
-    // ========================================
-
+    // نظام قاعدة البيانات
     if (
         value >= 0 &&
         value <= 11
@@ -272,9 +247,7 @@ function getSidebarEventMonth(event) {
 
     }
 
-
-    // احتياط إذا وصلت بيانات API مباشرة
-
+    // احتياط للبيانات التي تستخدم 1 - 12
     if (
         value >= 1 &&
         value <= 12
@@ -283,7 +256,6 @@ function getSidebarEventMonth(event) {
         return value - 1;
 
     }
-
 
     return null;
 
@@ -297,16 +269,12 @@ function getSidebarEventMonth(event) {
 function isSidebarHoliday(event) {
 
     if (!event) {
-
         return false;
-
     }
-
 
     const value =
         event.is_holiday ??
         event.isHoliday;
-
 
     if (
         value === true ||
@@ -317,27 +285,20 @@ function isSidebarHoliday(event) {
 
     }
 
-
     if (
         typeof value === "string"
     ) {
 
         const normalized =
-            value
-                .trim()
-                .toLowerCase();
-
+            value.trim().toLowerCase();
 
         return (
-
             normalized === "true" ||
             normalized === "1" ||
             normalized === "yes"
-
         );
 
     }
-
 
     return false;
 
@@ -351,11 +312,8 @@ function isSidebarHoliday(event) {
 function getSidebarEventType(event) {
 
     if (!event) {
-
         return "";
-
     }
-
 
     return (
         event.type ??
@@ -373,14 +331,7 @@ function getSidebarEventType(event) {
 function loadSidebarEvents() {
 
     const eventsList =
-        document.getElementById(
-            "month-events-list"
-        );
-
-
-    // ----------------------------------------
-    // التأكد من وجود القائمة
-    // ----------------------------------------
+        document.getElementById("month-events-list");
 
     if (!eventsList) {
 
@@ -392,361 +343,203 @@ function loadSidebarEvents() {
 
     }
 
-
-    // ----------------------------------------
-    // الحصول على المناسبات
-    // ----------------------------------------
-
     const allEvents =
-        typeof loadedHijriEvents !== "undefined"
+        typeof loadedHijriEvents !== "undefined" &&
+        Array.isArray(loadedHijriEvents)
             ? loadedHijriEvents
             : [];
 
-
-    // ----------------------------------------
-    // لا توجد بيانات بعد
-    // ----------------------------------------
-
-    if (
-        !Array.isArray(allEvents) ||
-        allEvents.length === 0
-    ) {
+    if (!allEvents.length) {
 
         eventsList.innerHTML = `
-
             <p class="no-sidebar-events">
                 لا توجد مناسبات
             </p>
-
         `;
 
         return;
 
     }
-
-
-    // ----------------------------------------
-    // الحصول على الشهر الهجري
-    // ----------------------------------------
 
     const currentMonth =
         getSidebarCurrentHijriMonth();
 
-
-    const currentYear =
-        getSidebarCurrentHijriYear();
-
-
-    // ----------------------------------------
-    // إذا لم نعرف الشهر بعد
-    // ----------------------------------------
-
-    if (
-        currentMonth === null
-    ) {
-
-      
+    if (currentMonth === null) {
 
         eventsList.innerHTML = `
-
             <p class="no-sidebar-events">
                 جاري تحميل المناسبات...
             </p>
-
         `;
 
         return;
 
     }
-
-
-    // ----------------------------------------
-    // فلترة المناسبات
-    // ----------------------------------------
 
     const sidebarEvents =
         allEvents
-            .filter(
-                event => {
+            .filter(event => {
 
-                    const eventMonth =
-                        getSidebarEventMonth(
-                            event
-                        );
+                const eventMonth =
+                    getSidebarEventMonth(event);
 
+                return (
+                    eventMonth !== null &&
+                    Number(eventMonth) ===
+                    Number(currentMonth)
+                );
 
-                    return (
+            })
+            .sort((a, b) => {
 
-                        eventMonth !== null &&
+                return (
+                    getSidebarEventDay(a) -
+                    getSidebarEventDay(b)
+                );
 
-                        Number(eventMonth) ===
-                        Number(currentMonth)
-
-                    );
-
-                }
-            )
-            .sort(
-                (a, b) => {
-
-                    return (
-                        getSidebarEventDay(a) -
-                        getSidebarEventDay(b)
-                    );
-
-                }
-            );
-
-
-    // ----------------------------------------
-    // تنظيف القائمة
-    // ----------------------------------------
+            });
 
     eventsList.innerHTML = "";
 
-
-    // ----------------------------------------
-    // لا توجد مناسبات في الشهر الحالي
-    // ----------------------------------------
-
-    if (
-        sidebarEvents.length === 0
-    ) {
+    if (!sidebarEvents.length) {
 
         const monthName =
-            sidebarHijriMonths[
-                currentMonth
-            ] || "";
-
+            sidebarHijriMonths[currentMonth] || "";
 
         eventsList.innerHTML = `
-
             <p class="no-sidebar-events">
-
                 لا توجد مناسبات
-                ${
-                    monthName
-                        ? `في شهر ${monthName}`
-                        : ""
-                }
-
+                ${monthName ? `في شهر ${monthName}` : ""}
             </p>
-
         `;
 
         return;
 
     }
 
+    sidebarEvents.forEach(event => {
 
-    // ----------------------------------------
-    // عرض عدد المناسبات في Console
-    // ----------------------------------------
+        const div =
+            document.createElement("div");
 
-    //console.log(
-     //   "Sidebar: الشهر الهجري:",
-    //    sidebarHijriMonths[currentMonth],
-//currentYear ?? "",
-     //   "| عدد المناسبات:",
-       // sidebarEvents.length
-    //);
+        div.className = "event";
 
 
-    // ----------------------------------------
-    // إنشاء عناصر المناسبات
-    // ----------------------------------------
+        // ====================================
+        // نوع المناسبة
+        // ====================================
 
-    sidebarEvents.forEach(
-        event => {
+        const eventType =
+            getSidebarEventType(event);
 
+        if (eventType === "birth") {
 
-            const div =
-                document.createElement(
-                    "div"
-                );
+            div.classList.add("birth");
 
+        }
+        else if (eventType === "marriage") {
 
-            div.className =
-                "event";
+            div.classList.add("marriage");
 
+        }
+        else if (eventType === "death") {
 
-            // =================================
-            // نوع المناسبة
-            // =================================
+            div.classList.add("death");
 
-            const eventType =
-                getSidebarEventType(
-                    event
-                );
+        }
+        else if (
+            eventType === "martyr" ||
+            eventType === "martyrdom"
+        ) {
 
+            div.classList.add("martyr");
 
-            if (
-                eventType === "birth"
-            ) {
+        }
 
-                div.classList.add(
-                    "birth"
-                );
 
-            }
+        // ====================================
+        // بيانات المناسبة
+        // ====================================
 
-            else if (
-                eventType === "marriage"
-            ) {
+        const title =
+            event.title ??
+            event.name ??
+            "مناسبة";
 
-                div.classList.add(
-                    "marriage"
-                );
+        const day =
+            getSidebarEventDay(event);
 
-            }
+        const month =
+            getSidebarEventMonth(event);
 
-            else if (
-                eventType === "death"
-            ) {
 
-                div.classList.add(
-                    "death"
-                );
+        // ====================================
+        // العطلة الرسمية
+        // ====================================
 
-            }
+        const isHoliday =
+            isSidebarHoliday(event);
 
-            else if (
-                eventType === "martyr" ||
-                eventType === "martyrdom"
-            ) {
+        if (isHoliday) {
 
-                div.classList.add(
-                    "martyr"
-                );
-
-            }
-
-
-            // =================================
-            // بيانات المناسبة
-            // =================================
-
-            const title =
-                event.title ??
-                event.name ??
-                "مناسبة";
-
-
-            const day =
-                getSidebarEventDay(
-                    event
-                );
-
-
-            const month =
-                getSidebarEventMonth(
-                    event
-                );
-
-
-            // =================================
-            // العطلة الرسمية
-            // =================================
-
-            const isHoliday =
-                isSidebarHoliday(
-                    event
-                );
-
-
-            // =================================
-            // شارة العطلة
-            // =================================
-
-            const holidayBadge =
-                isHoliday
-                    ? `
-
-                        <span class="sidebar-holiday">
-
-                            🔴 عطلة رسمية
-
-                        </span>
-
-                      `
-                    : "";
-
-
-            // =================================
-            // Class العطلة
-            // =================================
-
-            if (
-                isHoliday
-            ) {
-
-                div.classList.add(
-                    "official-holiday"
-                );
-
-            }
-
-
-            // =================================
-            // محتوى المناسبة
-            // =================================
-
-            div.innerHTML = `
-
-                <div class="sidebar-event-row">
-
-                    <span class="sidebar-event-day">
-
-                        ${day}
-
-                    </span>
-
-
-                    <div class="sidebar-event-info">
-
-                        <strong
-                            class="sidebar-event-title"
-                        >
-
-                            ${title}
-
-                        </strong>
-
-
-                        ${holidayBadge}
-
-                    </div>
-
-                </div>
-
-<small class="sidebar-event-date">
-
-    ${day}
-
-    ${
-
-        month !== null &&
-        sidebarHijriMonths[month]
-            ? ` ${sidebarHijriMonths[month]}`
-            : ""
-
-    }
-
-</small>
-
-            `;
-
-
-            // =================================
-            // إضافة إلى القائمة
-            // =================================
-
-            eventsList.appendChild(
-                div
+            div.classList.add(
+                "official-holiday"
             );
 
         }
-    );
+
+        const holidayBadge =
+            isHoliday
+                ? `
+                    <span class="sidebar-holiday">
+                        🔴 عطلة رسمية
+                    </span>
+                  `
+                : "";
+
+
+        // ====================================
+        // إنشاء المحتوى
+        // ====================================
+
+        div.innerHTML = `
+
+            <div class="sidebar-event-row">
+
+                <span class="sidebar-event-day">
+                    ${day}
+                </span>
+
+                <div class="sidebar-event-info">
+
+                    <strong class="sidebar-event-title">
+                        ${title}
+                    </strong>
+
+                    ${holidayBadge}
+
+                </div>
+
+            </div>
+
+            <small class="sidebar-event-date">
+
+                ${day}
+
+                ${
+                    month !== null &&
+                    sidebarHijriMonths[month]
+                        ? ` ${sidebarHijriMonths[month]}`
+                        : ""
+                }
+
+            </small>
+
+        `;
+
+        eventsList.appendChild(div);
+
+    });
 
 }
 
@@ -765,99 +558,58 @@ function refreshSidebarEvents() {
 // ============================================
 // مراقبة تغير الشهر الهجري
 // ============================================
-//
-// هذا الجزء مهم جدًا.
-//
-// عندما ينتقل المستخدم إلى شهر ميلادي
-// جديد، calendar.js يغيّر currentHijriMonth.
-//
-// نحن نراقب هذا التغيير ونحدّث القائمة
-// تلقائيًا بدون الحاجة لتعديل calendar.js.
-// ============================================
 
 function startSidebarHijriWatcher() {
 
-    setInterval(
-        function () {
+    setInterval(() => {
 
-            const currentMonth =
-                getSidebarCurrentHijriMonth();
+        const currentMonth =
+            getSidebarCurrentHijriMonth();
 
+        const currentYear =
+            getSidebarCurrentHijriYear();
 
-            const currentYear =
-                getSidebarCurrentHijriYear();
+        if (
+            currentMonth === lastSidebarHijriMonth &&
+            currentYear === lastSidebarHijriYear
+        ) {
 
+            return;
 
-            // --------------------------------
-            // لم يتغير شيء
-            // --------------------------------
+        }
 
-            if (
-                currentMonth ===
-                lastSidebarHijriMonth &&
+        lastSidebarHijriMonth =
+            currentMonth;
 
-                currentYear ===
-                lastSidebarHijriYear
-            ) {
+        lastSidebarHijriYear =
+            currentYear;
 
-                return;
+        if (
+            currentMonth !== null
+        ) {
 
-            }
+            loadSidebarEvents();
 
+        }
 
-            // --------------------------------
-            // حفظ القيمة الجديدة
-            // --------------------------------
-
-            lastSidebarHijriMonth =
-                currentMonth;
-
-
-            lastSidebarHijriYear =
-                currentYear;
-
-
-            // --------------------------------
-            // تحديث القائمة
-            // --------------------------------
-
-            if (
-                currentMonth !== null
-            ) {
-
-                loadSidebarEvents();
-
-            }
-
-        },
-
-        300
-
-    );
+    }, 300);
 
 }
 
 
 // ============================================
-// انتظار تحميل الصفحة
+// تشغيل القائمة
 // ============================================
 
 document.addEventListener(
     "DOMContentLoaded",
-    function () {
+    () => {
 
-        // محاولة أولى
         setTimeout(
-            function () {
-
-                loadSidebarEvents();
-
-            },
+            loadSidebarEvents,
             500
         );
 
-
-        // بدء مراقبة تغير الشهر
         startSidebarHijriWatcher();
 
     }
@@ -865,20 +617,17 @@ document.addEventListener(
 
 
 // ============================================
-// إتاحة الدوال عالميًا
+// الدوال العامة
 // ============================================
 
 window.loadSidebarEvents =
     loadSidebarEvents;
 
-
 window.refreshSidebarEvents =
     refreshSidebarEvents;
 
-
 window.isSidebarHoliday =
     isSidebarHoliday;
-
 
 window.getSidebarCurrentHijriMonth =
     getSidebarCurrentHijriMonth;

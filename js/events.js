@@ -1,46 +1,45 @@
 // ============================================
 // events.js
 // إدارة أحداث المستخدم
-// ============================================
-
-
-// ============================================
-// بيانات أحداث المستخدم
+// مواقيت الولاء
 // ============================================
 
 let userEvents = [];
 
 
 // ============================================
-// تحميل الأحداث من LocalStorage
+// تحميل أحداث المستخدم
 // ============================================
 
 function loadUserEvents() {
 
-    const saved = localStorage.getItem("calendarEvents");
+    const saved =
+        localStorage.getItem("calendarEvents");
 
-    if (saved) {
+    if (!saved) {
 
-        try {
+        userEvents = [];
 
-            userEvents = JSON.parse(saved);
+        return;
 
-            // التأكد من أن البيانات مصفوفة
-            if (!Array.isArray(userEvents)) {
-                userEvents = [];
-            }
+    }
 
-        } catch (error) {
+    try {
 
-            console.error(
-                "خطأ في قراءة أحداث المستخدم:",
-                error
-            );
+        const parsed =
+            JSON.parse(saved);
 
-            userEvents = [];
-        }
+        userEvents =
+            Array.isArray(parsed)
+                ? parsed
+                : [];
 
-    } else {
+    } catch (error) {
+
+        console.error(
+            "خطأ في قراءة أحداث المستخدم:",
+            error
+        );
 
         userEvents = [];
 
@@ -50,7 +49,26 @@ function loadUserEvents() {
 
 
 // ============================================
-// حفظ الأحداث في LocalStorage
+// تهيئة أحداث المستخدم
+// ============================================
+
+function initializeUserEvents() {
+
+    loadUserEvents();
+
+    if (
+        typeof renderUserEvents === "function"
+    ) {
+
+        renderUserEvents();
+
+    }
+
+}
+
+
+// ============================================
+// حفظ أحداث المستخدم
 // ============================================
 
 function saveUserEvents() {
@@ -64,89 +82,33 @@ function saveUserEvents() {
 
 
 // ============================================
-// عرض أحداث المستخدم في القائمة
-// ============================================
-
-function renderUserEvents() {
-
-    const list = document.getElementById("eventsList");
-
-    if (!list) {
-        return;
-    }
-
-    list.innerHTML = "";
-
-
-    // لا توجد أحداث
-    if (userEvents.length === 0) {
-
-        list.innerHTML = `
-            <div class="no-events">
-                لا توجد أحداث مضافة
-            </div>
-        `;
-
-        return;
-    }
-
-
-    // عرض الأحداث
-    userEvents.forEach(event => {
-
-        const div = document.createElement("div");
-
-        div.className = "event " + (event.type || "");
-
-
-        div.innerHTML = `
-            <span>
-                ${event.title || "حدث"}
-            </span>
-
-            <button
-                type="button"
-                onclick="deleteEvent(${event.id})"
-                title="حذف الحدث"
-            >
-                ×
-            </button>
-        `;
-
-
-        list.appendChild(div);
-
-    });
-
-}
-
-
-// ============================================
-// حذف حدث المستخدم
+// حذف حدث مستخدم
 // ============================================
 
 function deleteEvent(id) {
 
-    // تحويل id إلى رقم للمقارنة بشكل صحيح
-    id = Number(id);
+    const eventId =
+        Number(id);
 
+    userEvents =
+        userEvents.filter(
+            event =>
+                Number(event.id) !== eventId
+        );
 
-    // حذف الحدث
-    userEvents = userEvents.filter(
-        event => Number(event.id) !== id
-    );
-
-
-    // حفظ القائمة الجديدة
     saveUserEvents();
 
+    if (
+        typeof renderUserEvents === "function"
+    ) {
 
-    // إعادة عرض القائمة
-    renderUserEvents();
+        renderUserEvents();
 
+    }
 
-    // إعادة رسم التقويم
-    if (typeof renderCalendar === "function") {
+    if (
+        typeof renderCalendar === "function"
+    ) {
 
         renderCalendar();
 
@@ -156,16 +118,27 @@ function deleteEvent(id) {
 
 
 // ============================================
-// تشغيل أحداث المستخدم عند تحميل الصفحة
+// التشغيل
 // ============================================
 
 document.addEventListener(
     "DOMContentLoaded",
-    () => {
-
-        loadUserEvents();
-
-        renderUserEvents();
-
-    }
+    initializeUserEvents
 );
+
+
+// ============================================
+// الدوال العامة
+// ============================================
+
+window.loadUserEvents =
+    loadUserEvents;
+
+window.initializeUserEvents =
+    initializeUserEvents;
+
+window.saveUserEvents =
+    saveUserEvents;
+
+window.deleteEvent =
+    deleteEvent;

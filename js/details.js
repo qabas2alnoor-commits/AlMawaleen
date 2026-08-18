@@ -1,44 +1,46 @@
-
 // ============================================
 // details.js
 // إدارة نافذة تفاصيل اليوم
+// مواقيت الولاء
 // ============================================
 
-document.addEventListener("DOMContentLoaded", function () {
+document.addEventListener("DOMContentLoaded", () => {
 
-    var detailsModal =
+    const detailsModal =
         document.getElementById("detailsModal");
 
-    var closeDetails =
+    const closeDetails =
         document.getElementById("closeDetails");
 
     if (!detailsModal) {
 
         console.warn(
-            "لم يتم العثور على #detailsModal"
+            "Details: لم يتم العثور على #detailsModal"
         );
 
         return;
     }
 
+    // ========================================
     // زر الإغلاق
+    // ========================================
+
     if (closeDetails) {
 
         closeDetails.addEventListener(
             "click",
-            function () {
-
-                closeDetailsModal();
-
-            }
+            closeDetailsModal
         );
 
     }
 
-    // الضغط خارج النافذة
+    // ========================================
+    // الضغط خارج محتوى النافذة
+    // ========================================
+
     detailsModal.addEventListener(
         "click",
-        function (event) {
+        event => {
 
             if (event.target === detailsModal) {
 
@@ -58,7 +60,7 @@ document.addEventListener("DOMContentLoaded", function () {
 
 function closeDetailsModal() {
 
-    var modal =
+    const modal =
         document.getElementById("detailsModal");
 
     if (!modal) {
@@ -66,6 +68,7 @@ function closeDetailsModal() {
     }
 
     modal.style.display = "none";
+
 }
 
 
@@ -75,7 +78,7 @@ function closeDetailsModal() {
 
 function showDetailsModal() {
 
-    var modal =
+    const modal =
         document.getElementById("detailsModal");
 
     if (!modal) {
@@ -83,6 +86,7 @@ function showDetailsModal() {
     }
 
     modal.style.display = "flex";
+
 }
 
 
