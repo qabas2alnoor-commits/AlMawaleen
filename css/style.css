@@ -1602,6 +1602,7 @@ body.dark-mode .sidebar-holiday {
 }
 
 
+
 /* =========================================================
    small icon an about logo
    ========================================================= */
@@ -1621,7 +1622,89 @@ body.dark-mode .sidebar-holiday {
     border-radius: 8px;
 }
 
+/* ============================================
+   Splash Screen - Responsive Video
+   ============================================ */
 
+#splash-screen {
+    position: fixed;
+    inset: 0;
+    z-index: 99999;
+
+    display: flex;
+    align-items: center;
+    justify-content: center;
+
+    background: #000;
+
+    opacity: 1;
+    visibility: visible;
+
+    transition:
+        opacity 0.6s ease,
+        visibility 0.6s ease;
+}
+
+#splash-screen.hide {
+    opacity: 0;
+    visibility: hidden;
+    pointer-events: none;
+}
+
+/* حجم الفيديو الأساسي */
+#intro-video {
+    width: min(90vw, 650px);
+    height: auto;
+    max-height: 80vh;
+
+    object-fit: contain;
+
+    display: block;
+}
+
+
+/* ============================================
+   الهاتف
+   ============================================ */
+
+@media (max-width: 600px) {
+
+    #intro-video {
+        width: 90vw;
+        max-height: 75vh;
+    }
+
+}
+
+
+/* ============================================
+   التابلت
+   ============================================ */
+
+@media (min-width: 601px) and (max-width: 1024px) {
+
+    #intro-video {
+        width: 75vw;
+        max-width: 600px;
+        max-height: 78vh;
+    }
+
+}
+
+
+/* ============================================
+   الكمبيوتر والشاشات الكبيرة
+   ============================================ */
+
+@media (min-width: 1025px) {
+
+    #intro-video {
+        width: 500px;
+        max-width: 50vw;
+        max-height: 75vh;
+    }
+
+}
 /* =========================================================
    END
    ========================================================= */
