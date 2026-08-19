@@ -7,12 +7,6 @@ document.addEventListener("DOMContentLoaded", () => {
         return;
     }
 
-    console.log("✅ Splash loaded");
-    console.log(
-        "🎬 Video source:",
-        introVideo.currentSrc || introVideo.src
-    );
-
     let splashFinished = false;
 
     // ============================================
@@ -24,8 +18,6 @@ document.addEventListener("DOMContentLoaded", () => {
 
         splashFinished = true;
 
-        console.log("🎬 Hiding splash:", reason);
-
         splashScreen.classList.add("hide");
 
         setTimeout(() => {
@@ -35,46 +27,23 @@ document.addEventListener("DOMContentLoaded", () => {
 
     // ============================================
     // تشغيل الفيديو
-    // محاولة التشغيل بالصوت أولًا
-    // وإذا رفض المتصفح → التشغيل بصمت
     // ============================================
 
     function startVideo() {
         if (splashFinished) return;
 
-        console.log("▶️ Attempting to play video with sound");
-
-        // نحاول أولًا تشغيل الفيديو بالصوت
+        // محاولة التشغيل بالصوت
         introVideo.muted = false;
 
         introVideo.play()
-            .then(() => {
-                console.log("🔊 Video playing with sound");
-            })
-            .catch(error => {
-                console.warn(
-                    "⚠️ Browser blocked autoplay with sound:",
-                    error
-                );
+            .catch(() => {
 
-                // ============================================
-                // fallback
-                // إذا منع المتصفح التشغيل بالصوت
-                // نشغل الفيديو بصمت حتى لا يبقى التطبيق أسود
-                // ============================================
-
+                // المتصفح منع التشغيل بالصوت
+                // ننتقل للتشغيل بصمت
                 introVideo.muted = true;
 
                 introVideo.play()
-                    .then(() => {
-                        console.log("🔇 Video playing muted");
-                    })
-                    .catch(playError => {
-                        console.error(
-                            "❌ Video play failed:",
-                            playError
-                        );
-
+                    .catch(() => {
                         hideSplash("video play failed");
                     });
             });
@@ -85,21 +54,11 @@ document.addEventListener("DOMContentLoaded", () => {
     // ============================================
 
     introVideo.addEventListener("loadeddata", () => {
-        console.log("✅ Video loaded successfully");
-
         startVideo();
     });
 
     // ============================================
-    // الفيديو أصبح قابلًا للتشغيل
-    // ============================================
-
-    introVideo.addEventListener("canplay", () => {
-        console.log("✅ Video can play");
-    });
-
-    // ============================================
-    // حدث خطأ في تحميل الفيديو
+    // خطأ تحميل الفيديو
     // ============================================
 
     introVideo.addEventListener("error", () => {
@@ -108,7 +67,6 @@ document.addEventListener("DOMContentLoaded", () => {
             introVideo.error
         );
 
-        // لا نبقي التطبيق أسودًا
         hideSplash("video load failed");
     });
 
@@ -117,35 +75,14 @@ document.addEventListener("DOMContentLoaded", () => {
     // ============================================
 
     introVideo.addEventListener("ended", () => {
-        console.log("✅ Video ended");
-
         hideSplash("video ended");
     });
 
     // ============================================
-    // مهم:
-    // إذا كان الفيديو قد تم تحميله قبل تسجيل الأحداث
+    // إذا كان الفيديو محملًا مسبقًا
     // ============================================
 
     if (introVideo.readyState >= 2) {
-        console.log(
-            "ℹ️ Video was already loaded. readyState:",
-            introVideo.readyState
-        );
-
-        console.log("✅ Video loaded successfully");
-
         startVideo();
-    }
-
-    // ============================================
-    // إذا كان الفيديو جاهزًا للتشغيل مسبقًا
-    // ============================================
-
-    if (introVideo.readyState >= 3) {
-        console.log(
-            "ℹ️ Video is already ready to play. readyState:",
-            introVideo.readyState
-        );
     }
 });
