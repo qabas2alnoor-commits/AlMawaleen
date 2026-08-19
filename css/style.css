@@ -975,21 +975,24 @@ aside h2 {
 .about-footer {
     display: flex;
 
+    align-items: center;
+
     justify-content: center;
 
-    flex-wrap: wrap;
+    gap: 10px;
 
-    gap: 8px;
+    flex-wrap: nowrap;
 
     margin-top: 20px;
 
-    padding-top: 15px;
+    padding-top: 6px;
 
     border-top: 1px solid var(--border);
 
     color: var(--green-dark);
 
-    font-size: 13px;
+    font-size: 14px;
+
 
     font-weight: 600;
 }
