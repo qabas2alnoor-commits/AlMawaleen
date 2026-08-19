@@ -394,6 +394,12 @@ async function getHijriMonthData(
             Number(item.hijriYear) === Number(hijriYear)
         );
 
+        // تصحيح ذي الحجة فقط
+const fixedResult =
+    Number(hijriMonth) === 12 &&
+    typeof fixDhuAlHijjahMonth === "function"
+        ? fixDhuAlHijjahMonth(result)
+        : result;
     // ترتيب الأيام هجريًا
     result.sort(
         (a, b) =>
@@ -401,7 +407,7 @@ async function getHijriMonthData(
             Number(b.hijriDay)
     );
 
-    return result;
+   return fixedResult;
 }
 
 // ============================================
@@ -1016,8 +1022,12 @@ function createImportanceStars(level) {
 // ============================================
 // الشهر الهجري التالي
 // ============================================
+// ============================================
+// الشهر الهجري التالي
+// ============================================
 
 async function nextMonth() {
+
     if (
         currentHijriMonth === null ||
         currentHijriYear === null
@@ -1025,32 +1035,7 @@ async function nextMonth() {
         await initializeHijriMonth();
     }
 
-    const currentData =
-        await getHijriMonthData(
-            currentHijriMonth,
-            currentHijriYear,
-            hijriAnchorDate
-        );
-
-    if (currentData.length) {
-        const lastDay =
-            currentData[currentData.length - 1];
-
-        const lastDate =
-            getGregorianDateFromHijri(
-                lastDay
-            );
-
-        if (lastDate) {
-            hijriAnchorDate =
-                new Date(lastDate);
-
-            hijriAnchorDate.setDate(
-                hijriAnchorDate.getDate() + 1
-            );
-        }
-    }
-
+    // الانتقال مباشرة إلى الشهر التالي
     currentHijriMonth++;
 
     if (currentHijriMonth > 12) {
@@ -1058,14 +1043,17 @@ async function nextMonth() {
         currentHijriYear++;
     }
 
+    // إعادة رسم التقويم
     await renderCalendar();
 }
+
 
 // ============================================
 // الشهر الهجري السابق
 // ============================================
 
 async function previousMonth() {
+
     if (
         currentHijriMonth === null ||
         currentHijriYear === null
@@ -1073,32 +1061,7 @@ async function previousMonth() {
         await initializeHijriMonth();
     }
 
-    const currentData =
-        await getHijriMonthData(
-            currentHijriMonth,
-            currentHijriYear,
-            hijriAnchorDate
-        );
-
-    if (currentData.length) {
-        const firstDay =
-            currentData[0];
-
-        const firstDate =
-            getGregorianDateFromHijri(
-                firstDay
-            );
-
-        if (firstDate) {
-            hijriAnchorDate =
-                new Date(firstDate);
-
-            hijriAnchorDate.setDate(
-                hijriAnchorDate.getDate() - 1
-            );
-        }
-    }
-
+    // الانتقال مباشرة إلى الشهر السابق
     currentHijriMonth--;
 
     if (currentHijriMonth < 1) {
@@ -1106,6 +1069,7 @@ async function previousMonth() {
         currentHijriYear--;
     }
 
+    // إعادة رسم التقويم
     await renderCalendar();
 }
 
