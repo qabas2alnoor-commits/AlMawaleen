@@ -933,19 +933,21 @@ aside h2 {
 
 .about-body h3 {
     color: var(--green);
-
     margin-bottom: 10px;
 }
 
 .about-body p {
     line-height: 1.9;
-
     color: var(--muted);
 }
 
+
+/* =========================================================
+   ABOUT FEATURES
+   ========================================================= */
+
 .about-features {
     display: grid;
-
     grid-template-columns: repeat(2, 1fr);
 
     gap: 10px;
@@ -962,7 +964,6 @@ aside h2 {
     gap: 8px;
 
     background: var(--green-light);
-
     color: var(--green-dark);
 
     border-radius: 8px;
@@ -972,11 +973,14 @@ aside h2 {
     color: var(--gold-dark);
 }
 
+
+/* =========================================================
+   ABOUT FOOTER
+   ========================================================= */
+
 .about-footer {
     display: flex;
-
     align-items: center;
-
     justify-content: center;
 
     gap: 10px;
@@ -984,7 +988,6 @@ aside h2 {
     flex-wrap: nowrap;
 
     margin-top: 20px;
-
     padding-top: 6px;
 
     border-top: 1px solid var(--border);
@@ -992,11 +995,142 @@ aside h2 {
     color: var(--green-dark);
 
     font-size: 16px;
-
-
     font-weight: 600;
 }
 
+
+/* =========================================================
+   ABOUT - MOBILE
+   ========================================================= */
+
+@media (max-width: 600px) {
+
+    /* المحتوى */
+    .about-content {
+        text-align: center;
+    }
+
+
+    /* العنوان */
+    .about-body h3 {
+        font-size: 18px;
+        line-height: 1.7;
+
+        margin-bottom: 8px;
+    }
+
+
+    /* النص */
+    .about-body p {
+        font-size: 14px;
+        line-height: 1.8;
+    }
+
+
+    /* =====================================================
+       البطاقات الأربع
+       ===================================================== */
+
+    .about-features {
+        gap: 6px;
+        margin-top: 12px;
+    }
+
+    .about-features div {
+        padding: 6px 5px;
+
+        min-height: 48px;
+
+        display: flex;
+        flex-direction: row;
+
+        align-items: center;
+
+        /* اتجاه عربي من اليمين */
+        justify-content: flex-start;
+        direction: rtl;
+        text-align: right;
+
+        gap: 4px;
+
+        /* تصغير الخط */
+        font-size: 11px;
+        line-height: 1.45;
+    }
+
+    .about-features i {
+        font-size: 14px;
+        flex-shrink: 0;
+    }
+
+
+    /* =====================================================
+       ABOUT FOOTER
+       ===================================================== */
+
+    .about-footer {
+        margin-top: 8px;
+        padding-top: 6px;
+        padding-bottom: 0;
+
+        display: flex;
+        flex-direction: row;
+
+        align-items: center;
+        justify-content: center;
+
+        gap: 10px;
+
+        min-height: 55px;
+
+        flex-wrap: nowrap;
+
+        font-size: 11px;
+        line-height: 1.2;
+
+        text-align: center;
+    }
+
+
+    /* الشعار */
+    .about-footer img,
+    .about-logo {
+        width: 45px;
+        max-width: 45px;
+
+        height: auto;
+        max-height: 45px;
+
+        object-fit: contain;
+
+        margin: 0 !important;
+        padding: 0 !important;
+
+        flex-shrink: 0;
+    }
+
+
+    /* نصوص الفوتر */
+    .about-footer span,
+    .about-footer p {
+        margin: 0 !important;
+        padding: 0 !important;
+
+        line-height: 1.2;
+
+        white-space: nowrap;
+    }
+
+
+    /* تقليل الفراغ السفلي */
+    .about-body {
+        padding-bottom: 8px !important;
+    }
+
+    .about-content {
+        padding-bottom: 8px !important;
+    }
+}
 
 /* =========================================================
    29. DARK MODE
