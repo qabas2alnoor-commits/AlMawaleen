@@ -659,16 +659,16 @@ async function renderCalendar() {
     }
 
     // إنشاء أيام الشهر
-    monthData.forEach(hijriDayData => {
+monthData.forEach(hijriDayData => {
         createDay(
             hijriDayData,
             calendar
         );
     });
-
-    // تحديث المناسبات الجانبية
+// تحديث المناسبات الجانبية
+    // بعد اكتمال رسم التقويم
     if (typeof showMonthEvents === "function") {
-        showMonthEvents([
+        await showMonthEvents([
             {
                 month: currentHijriMonth,
                 year: currentHijriYear
@@ -676,7 +676,6 @@ async function renderCalendar() {
         ]);
     }
 }
-
 // ============================================
 // إنشاء يوم
 // ============================================
