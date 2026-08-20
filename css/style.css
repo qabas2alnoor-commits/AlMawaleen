@@ -1842,6 +1842,19 @@ body.dark-mode .sidebar-holiday {
     }
 
 }
+/* ============================================
+   PWA INSTALL BUTTON
+   ضبط زر تثبيت التطبيق
+============================================ */
+
+#installAppBtn {
+    display: none;
+    align-items: center;
+    justify-content: center;
+    gap: 6px;
+    height: 100%;
+    box-sizing: border-box;
+}
 /* =========================================================
    END
    ========================================================= */
