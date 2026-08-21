@@ -1848,7 +1848,7 @@ body.dark-mode .sidebar-holiday {
 ============================================ */
 
 #installAppBtn {
-    display: none;
+     display: inline-flex;
     align-items: center;
     justify-content: center;
     gap: 6px;

@@ -8,6 +8,7 @@ document.addEventListener("DOMContentLoaded", () => {
     }
 
     let splashFinished = false;
+    let soundEnabled = false;
 
     // ============================================
     // إخفاء شاشة البداية
@@ -37,35 +38,91 @@ document.addEventListener("DOMContentLoaded", () => {
         introVideo.muted = false;
         introVideo.volume = 1;
 
-        const playPromise = introVideo.play();
+        introVideo.play()
+            .then(() => {
+                soundEnabled = true;
 
-        if (playPromise !== undefined) {
-            playPromise
-                .then(() => {
-                    console.log("🔊 Intro playing with sound");
-                })
-                .catch((error) => {
-                    console.warn(
-                        "⚠️ Autoplay with sound blocked:",
-                        error
-                    );
+                console.log(
+                    "🔊 Intro playing with sound"
+                );
+            })
+            .catch((error) => {
+                console.warn(
+                    "⚠️ Autoplay with sound blocked:",
+                    error
+                );
 
-                    // إذا منع الصوت، نشغل الفيديو بصمت
-                    introVideo.muted = true;
+                // تشغيل الفيديو بصمت حتى لا تتوقف شاشة البداية
+                introVideo.muted = true;
 
-                    introVideo.play()
-                        .catch(() => {
-                            hideSplash("video play failed");
-                        });
-                });
-        }
+                introVideo.play()
+                    .then(() => {
+                        console.log(
+                            "🔇 Intro playing muted"
+                        );
+                    })
+                    .catch(() => {
+                        hideSplash("video play failed");
+                    });
+            });
     }
+
+    // ============================================
+    // تفعيل الصوت بعد أول تفاعل من المستخدم
+    // ============================================
+
+    function enableVideoSound() {
+        if (splashFinished || soundEnabled) {
+            return;
+        }
+
+        introVideo.muted = false;
+        introVideo.volume = 1;
+
+        introVideo.play()
+            .then(() => {
+                soundEnabled = true;
+
+                console.log(
+                    "🔊 Intro sound enabled after user interaction"
+                );
+            })
+            .catch((error) => {
+                console.warn(
+                    "⚠️ Could not enable intro sound:",
+                    error
+                );
+            });
+    }
+
+    // ============================================
+    // أول نقرة
+    // ============================================
+
+    document.addEventListener(
+        "click",
+        enableVideoSound,
+        { once: true }
+    );
+
+    // ============================================
+    // أول لمسة على الهاتف
+    // ============================================
+
+    document.addEventListener(
+        "touchstart",
+        enableVideoSound,
+        { once: true }
+    );
 
     // ============================================
     // تحميل الفيديو
     // ============================================
 
-    introVideo.addEventListener("loadeddata", startVideo);
+    introVideo.addEventListener(
+        "loadeddata",
+        startVideo
+    );
 
     // ============================================
     // انتهاء الفيديو
@@ -89,7 +146,7 @@ document.addEventListener("DOMContentLoaded", () => {
     });
 
     // ============================================
-    // إذا كان جاهزًا مسبقًا
+    // إذا كان الفيديو جاهزًا مسبقًا
     // ============================================
 
     if (introVideo.readyState >= 2) {

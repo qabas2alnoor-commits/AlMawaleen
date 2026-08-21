@@ -5,7 +5,8 @@
 
 let deferredInstallPrompt = null;
 
-const installAppBtn = document.getElementById("installAppBtn");
+const installAppBtn =
+    document.getElementById("installAppBtn");
 
 // ============================================
 // استقبال طلب التثبيت من المتصفح
@@ -17,12 +18,7 @@ window.addEventListener("beforeinstallprompt", (event) => {
 
     deferredInstallPrompt = event;
 
-    // إظهار زر التثبيت
-    if (installAppBtn) {
-        installAppBtn.style.display = "inline-flex";
-    }
-
-    console.log("PWA: التثبيت متاح");
+    console.log("PWA: التثبيت المباشر متاح");
 });
 
 // ============================================
@@ -33,25 +29,37 @@ if (installAppBtn) {
 
     installAppBtn.addEventListener("click", async () => {
 
-        if (!deferredInstallPrompt) {
-            console.log("PWA: التثبيت غير متاح حاليًا");
+        // ========================================
+        // التثبيت المباشر متاح
+        // ========================================
+
+        if (deferredInstallPrompt) {
+
+            deferredInstallPrompt.prompt();
+
+            const { outcome } =
+                await deferredInstallPrompt.userChoice;
+
+            console.log("PWA install:", outcome);
+
+            deferredInstallPrompt = null;
+
+            if (outcome === "accepted") {
+                installAppBtn.style.display = "none";
+            }
+
             return;
         }
 
-        // إظهار نافذة التثبيت
-        deferredInstallPrompt.prompt();
+        // ========================================
+        // التثبيت المباشر غير متاح
+        // ========================================
 
-        // انتظار اختيار المستخدم
-        const { outcome } =
-            await deferredInstallPrompt.userChoice;
-
-        console.log("PWA install:", outcome);
-
-        // التخلص من الطلب بعد استخدامه
-        deferredInstallPrompt = null;
-
-        // إخفاء الزر
-        installAppBtn.style.display = "none";
+        alert(
+            "📲 لتثبيت تطبيق مواقيت الولاء:\n\n" +
+            "اضغط على ⋮ أعلى المتصفح، " +
+            "ثم اختر «تثبيت التطبيق» أو «إضافة إلى الشاشة الرئيسية»."
+        );
     });
 }
 
