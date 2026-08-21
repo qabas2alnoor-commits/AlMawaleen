@@ -18,6 +18,8 @@ document.addEventListener("DOMContentLoaded", () => {
 
         splashFinished = true;
 
+        console.log("Splash finished:", reason);
+
         splashScreen.classList.add("hide");
 
         setTimeout(() => {
@@ -32,43 +34,38 @@ document.addEventListener("DOMContentLoaded", () => {
     function startVideo() {
         if (splashFinished) return;
 
-        // محاولة التشغيل بالصوت
         introVideo.muted = false;
+        introVideo.volume = 1;
 
-        introVideo.play()
-            .catch(() => {
+        const playPromise = introVideo.play();
 
-                // المتصفح منع التشغيل بالصوت
-                // ننتقل للتشغيل بصمت
-                introVideo.muted = true;
+        if (playPromise !== undefined) {
+            playPromise
+                .then(() => {
+                    console.log("🔊 Intro playing with sound");
+                })
+                .catch((error) => {
+                    console.warn(
+                        "⚠️ Autoplay with sound blocked:",
+                        error
+                    );
 
-                introVideo.play()
-                    .catch(() => {
-                        hideSplash("video play failed");
-                    });
-            });
+                    // إذا منع الصوت، نشغل الفيديو بصمت
+                    introVideo.muted = true;
+
+                    introVideo.play()
+                        .catch(() => {
+                            hideSplash("video play failed");
+                        });
+                });
+        }
     }
 
     // ============================================
-    // الفيديو أصبح محملًا
+    // تحميل الفيديو
     // ============================================
 
-    introVideo.addEventListener("loadeddata", () => {
-        startVideo();
-    });
-
-    // ============================================
-    // خطأ تحميل الفيديو
-    // ============================================
-
-    introVideo.addEventListener("error", () => {
-        console.error(
-            "❌ Video failed to load:",
-            introVideo.error
-        );
-
-        hideSplash("video load failed");
-    });
+    introVideo.addEventListener("loadeddata", startVideo);
 
     // ============================================
     // انتهاء الفيديو
@@ -79,7 +76,20 @@ document.addEventListener("DOMContentLoaded", () => {
     });
 
     // ============================================
-    // إذا كان الفيديو محملًا مسبقًا
+    // خطأ الفيديو
+    // ============================================
+
+    introVideo.addEventListener("error", () => {
+        console.error(
+            "❌ Video failed to load:",
+            introVideo.error
+        );
+
+        hideSplash("video error");
+    });
+
+    // ============================================
+    // إذا كان جاهزًا مسبقًا
     // ============================================
 
     if (introVideo.readyState >= 2) {
