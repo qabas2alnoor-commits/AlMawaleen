@@ -14,22 +14,27 @@
          PWA
     ============================================ -->
 
-    <link
-        rel="manifest"
-        href="manifest.json"
-    >
+   
+<link rel="manifest" href="manifest.json">
 
-    <meta
-        name="theme-color"
-        content="#123b2a"
-    >
+<meta name="theme-color" content="#064E3B">
+
+<!-- iPhone / iPad PWA -->
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="default">
+<meta name="apple-mobile-web-app-title" content="مواقيت الموالين">
+
+<link
+    rel="apple-touch-icon"
+    href="assets/icons/icon-192.png"
+>
 
 
     <!-- ============================================
          عنوان التطبيق
     ============================================ -->
 
-    <title>مواقيت الولاء</title>
+    <title>مواقيت الموالين</title>
 
 
     <!-- ============================================
@@ -303,7 +308,7 @@
 
                 <i class="fa-solid fa-circle-info"></i>
 
-                مواقيت الولاء
+                مواقيت الموالين
 
             </h2>
 
@@ -316,7 +321,7 @@
 
                 </h3>
                  <p>
-                    تطبيق مواقيت الولاء إحدى الإنجازات الرائدة التي تقدمها * قبس النور* للبرمجة 
+                    تطبيق مواقيت الموالين إحدى الإنجازات الرائدة التي تقدمها * قبس النور* للبرمجة 
                 </p>
 
                 <p>
@@ -527,6 +532,15 @@
         defer
     ></script>
     <!-- ============================================
+     OFFLINE STATUS
+     مراقبة حالة الاتصال
+============================================ -->
+
+<script
+    src="js/offline.js"
+    defer
+></script>
+    <!-- ============================================
          Main Calendar
          يجب أن يكون آخر ملف
     ============================================ -->
@@ -544,7 +558,41 @@
         src="js/install.js"
         defer
     ></script>
+        <!-- ============================================
+         SERVICE WORKER
+         Offline Support
+    ============================================ -->
 
+<script>
+        if ("serviceWorker" in navigator) {
+
+            window.addEventListener("load", () => {
+
+                navigator.serviceWorker
+                    .register("./service-worker.js")
+
+                    .then(registration => {
+
+                        console.log(
+                            "Service Worker registered:",
+                            registration.scope
+                        );
+
+                    })
+
+                    .catch(error => {
+
+                        console.error(
+                            "Service Worker registration failed:",
+                            error
+                        );
+
+                    });
+
+            });
+
+        }
+    </script>
 
 </body>
 

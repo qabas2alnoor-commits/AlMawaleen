@@ -1,13 +1,16 @@
 // ============================================
 // hijri-settings.js
 // إعدادات التقويم الهجري الإمامي
-// مواقيت الولاء
+// تطبيق الموالين
 // ============================================
 //
-// مصدر إعداد التصحيح:
+// Online:
 // Supabase → app_settings → hijri_offset
 //
-// القيم المسموحة فقط:
+// Offline:
+// آخر قيمة صحيحة محفوظة على الجهاز
+//
+// القيم المسموحة:
 // -1 = أخذ التاريخ الهجري لليوم الميلادي السابق
 //  0 = بدون تعديل
 // +1 = أخذ التاريخ الهجري لليوم الميلادي التالي
@@ -17,9 +20,16 @@
 // لا يتم تغيير طول الشهر الهجري.
 // لا يتم افتراض أن الشهر 29 أو 30 يومًا.
 //
-// calendar.js هو المسؤول عن تطبيق التصحيح
-// على التاريخ الهجري فقط.
+// calendar.js هو المسؤول عن تطبيق التصحيح.
 // ============================================
+
+
+// ============================================
+// إعدادات التخزين المحلي
+// ============================================
+
+const HIJRI_OFFSET_STORAGE_KEY =
+    "mawaqit_al_mowaleen_hijri_offset";
 
 
 // ============================================
@@ -30,17 +40,148 @@ let hijriOffset = 0;
 
 
 // ============================================
-// تحميل إعداد التصحيح من Supabase
+// التحقق من قيمة التصحيح
+// ============================================
+
+function isValidHijriOffset(value) {
+
+    return (
+        value === -1 ||
+        value === 0 ||
+        value === 1
+    );
+
+}
+
+
+// ============================================
+// قراءة آخر قيمة محفوظة محليًا
+// ============================================
+
+function getStoredHijriOffset() {
+
+    try {
+
+        const storedValue =
+            localStorage.getItem(
+                HIJRI_OFFSET_STORAGE_KEY
+            );
+
+        if (storedValue === null) {
+
+            return null;
+
+        }
+
+        const value =
+            Number(storedValue);
+
+        if (isValidHijriOffset(value)) {
+
+            return value;
+
+        }
+
+    }
+
+    catch (error) {
+
+        console.warn(
+            "تعذر قراءة hijri_offset من التخزين المحلي:",
+            error
+        );
+
+    }
+
+    return null;
+
+}
+
+
+// ============================================
+// حفظ قيمة التصحيح محليًا
+// ============================================
+
+function saveHijriOffset(value) {
+
+    if (!isValidHijriOffset(value)) {
+
+        return;
+
+    }
+
+    try {
+
+        localStorage.setItem(
+            HIJRI_OFFSET_STORAGE_KEY,
+            String(value)
+        );
+
+    }
+
+    catch (error) {
+
+        console.warn(
+            "تعذر حفظ hijri_offset محليًا:",
+            error
+        );
+
+    }
+
+}
+
+
+// ============================================
+// تحميل إعداد التصحيح
 // ============================================
 
 async function loadHijriOffset() {
 
     // ----------------------------------------
-    // القيمة الافتراضية الآمنة
+    // محاولة استخدام آخر قيمة محفوظة
     // ----------------------------------------
 
-    hijriOffset = 0;
+    const storedValue =
+        getStoredHijriOffset();
 
+    if (storedValue !== null) {
+
+        hijriOffset = storedValue;
+
+        console.log(
+            `تم تحميل hijri_offset من التخزين المحلي: ${hijriOffset}`
+        );
+
+    }
+
+    else {
+
+        // القيمة الافتراضية الآمنة
+        hijriOffset = 0;
+
+    }
+
+
+    // ----------------------------------------
+    // إذا كان التطبيق Offline
+    // نستخدم القيمة المحلية مباشرة
+    // ولا نحاول الاتصال بـ Supabase
+    // ----------------------------------------
+
+    if (!navigator.onLine) {
+
+        console.log(
+            `🔴 Offline: استخدام hijri_offset المحلي: ${hijriOffset}`
+        );
+
+        return hijriOffset;
+
+    }
+
+
+    // ----------------------------------------
+    // Online → محاولة تحديث القيمة من Supabase
+    // ----------------------------------------
 
     try {
 
@@ -53,7 +194,7 @@ async function loadHijriOffset() {
         ) {
 
             console.warn(
-                "Supabase غير متوفر، سيتم استخدام hijri_offset = 0"
+                "Supabase غير متوفر، سيتم استخدام القيمة المحلية."
             );
 
             return hijriOffset;
@@ -84,8 +225,8 @@ async function loadHijriOffset() {
 
         if (error) {
 
-            console.error(
-                "خطأ قراءة hijri_offset من Supabase:",
+            console.warn(
+                "تعذر قراءة hijri_offset من Supabase، سيتم استخدام القيمة المحلية:",
                 error
             );
 
@@ -101,7 +242,7 @@ async function loadHijriOffset() {
         if (!data) {
 
             console.warn(
-                "لم يتم العثور على إعداد hijri_offset في Supabase، سيتم استخدام 0"
+                "لم يتم العثور على hijri_offset في Supabase، سيتم استخدام القيمة المحلية."
             );
 
             return hijriOffset;
@@ -120,48 +261,42 @@ async function loadHijriOffset() {
 
 
         // ----------------------------------------
-        // التحقق من القيم المسموحة
+        // التحقق من القيمة
         // ----------------------------------------
 
         if (
-            value === -1 ||
-            value === 0 ||
-            value === 1
+            isValidHijriOffset(value)
         ) {
 
             hijriOffset = value;
+
+            // حفظ آخر قيمة صحيحة
+            saveHijriOffset(
+                hijriOffset
+            );
+
+            console.log(
+                `تم تحديث hijri_offset من Supabase: ${hijriOffset}`
+            );
 
         }
 
         else {
 
             console.warn(
-                `قيمة hijri_offset غير صحيحة: ${data.setting_value} — سيتم استخدام 0`
+                `قيمة hijri_offset غير صحيحة: ${data.setting_value} — سيتم استخدام القيمة المحلية.`
             );
 
-            hijriOffset = 0;
-
         }
-
-
-        // ----------------------------------------
-        // تشخيص
-        // ----------------------------------------
-
-        console.log(
-            `تم تحميل hijri_offset من Supabase: ${hijriOffset}`
-        );
 
     }
 
     catch (error) {
 
-        console.error(
-            "خطأ تحميل إعدادات التقويم الهجري:",
+        console.warn(
+            "تعذر الاتصال بـ Supabase، سيتم استخدام آخر قيمة محفوظة محليًا:",
             error
         );
-
-        hijriOffset = 0;
 
     }
 
@@ -177,24 +312,13 @@ async function loadHijriOffset() {
 
 function getHijriOffset() {
 
-    // ----------------------------------------
-    // السماح فقط بالقيم الثلاث
-    // ----------------------------------------
-
     if (
-        hijriOffset === -1 ||
-        hijriOffset === 0 ||
-        hijriOffset === 1
+        isValidHijriOffset(hijriOffset)
     ) {
 
         return hijriOffset;
 
     }
-
-
-    // ----------------------------------------
-    // قيمة احتياطية
-    // ----------------------------------------
 
     return 0;
 

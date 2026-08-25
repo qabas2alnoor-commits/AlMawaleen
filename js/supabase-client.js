@@ -1,7 +1,7 @@
 // ============================================
 // supabase-client.js
 // اتصال Supabase
-// مواقيت الولاء
+// تطبيق الموالين
 // ============================================
 
 
@@ -40,7 +40,7 @@ if (
 
 
     // ========================================
-    // إتاحة العميل لجميع الملفات
+    // إتاحة العميل عالميًا
     // ========================================
 
     window.supabaseClient =
@@ -50,71 +50,5 @@ if (
     console.log(
         "Supabase Client تم تهيئته بنجاح."
     );
-
-
-    // ========================================
-    // تحميل المناسبات من Supabase
-    // ========================================
-
-    async function loadSupabaseEvents() {
-
-        try {
-
-            const {
-                data,
-                error
-            } =
-                await supabaseClient
-                    .from("events")
-                    .select("*")
-                    .eq("is_active", true)
-                    .order(
-                        "hijri_month",
-                        {
-                            ascending: true
-                        }
-                    )
-                    .order(
-                        "hijri_day",
-                        {
-                            ascending: true
-                        }
-                    );
-
-            if (error) {
-
-                console.error(
-                    "خطأ تحميل المناسبات من Supabase:",
-                    error
-                );
-
-                return [];
-
-            }
-
-            return Array.isArray(data)
-                ? data
-                : [];
-
-        } catch (error) {
-
-            console.error(
-                "خطأ في الاتصال بـ Supabase:",
-                error
-            );
-
-            return [];
-
-        }
-
-    }
-
-
-    // ========================================
-    // جعل الدالة متاحة عالمياً
-    // ========================================
-
-    window.loadSupabaseEvents =
-        loadSupabaseEvents;
 
 }

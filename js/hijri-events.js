@@ -1,9 +1,15 @@
 // ============================================
 // hijri-events.js
 // المناسبات الهجرية
-// المصدر الوحيد: Supabase
-// مواقيت الولاء
+// Online + Offline
+// مواقيت الموالين
 // ============================================
+//
+// Online:
+// المصدر الأساسي: Supabase
+//
+// Offline:
+// آخر نسخة ناجحة محفوظة في localStorage
 //
 // نظام الأشهر:
 //
@@ -21,8 +27,10 @@
 //
 // هذا الملف مسؤول عن:
 // 1. تحميل المناسبات من Supabase.
-// 2. تحويل نظام الأشهر.
-// 3. توفير المناسبات لـ calendar.js.
+// 2. حفظ آخر نسخة ناجحة محليًا.
+// 3. تحميل آخر نسخة محلية عند Offline.
+// 4. تحويل نظام الأشهر.
+// 5. توفير المناسبات لـ calendar.js.
 //
 // لا يغير التاريخ الهجري.
 // لا يغير طول الأشهر.
@@ -30,7 +38,19 @@
 // ============================================
 
 
+// ============================================
+// البيانات الحالية للمناسبات
+// ============================================
+
 let loadedHijriEvents = [];
+
+
+// ============================================
+// مفتاح التخزين المحلي
+// ============================================
+
+const HIJRI_EVENTS_STORAGE_KEY =
+    "mawaqit_al_mowaleen_hijri_events";
 
 
 // ============================================
@@ -171,6 +191,143 @@ function normalizeSupabaseEvent(event) {
 
 
 // ============================================
+// حفظ المناسبات محليًا
+// ============================================
+
+function saveHijriEventsToLocalStorage(events) {
+
+    if (
+        !Array.isArray(events) ||
+        events.length === 0
+    ) {
+
+        console.warn(
+            "لن يتم حفظ قائمة مناسبات فارغة."
+        );
+
+        return false;
+
+    }
+
+    try {
+
+        localStorage.setItem(
+            HIJRI_EVENTS_STORAGE_KEY,
+            JSON.stringify(events)
+        );
+
+        console.log(
+            `تم حفظ ${events.length} مناسبة محليًا.`
+        );
+
+        return true;
+
+    }
+
+    catch (error) {
+
+        console.warn(
+            "تعذر حفظ المناسبات محليًا:",
+            error
+        );
+
+        return false;
+
+    }
+
+}
+
+
+// ============================================
+// تحميل المناسبات من التخزين المحلي
+// ============================================
+
+function loadHijriEventsFromLocalStorage() {
+
+    try {
+
+        const storedData =
+            localStorage.getItem(
+                HIJRI_EVENTS_STORAGE_KEY
+            );
+
+
+        // ----------------------------------------
+        // لا توجد نسخة محلية
+        // ----------------------------------------
+
+        if (
+            !storedData
+        ) {
+
+            console.warn(
+                "لا توجد نسخة محلية من المناسبات."
+            );
+
+            return [];
+
+        }
+
+
+        // ----------------------------------------
+        // تحويل JSON
+        // ----------------------------------------
+
+        const parsedData =
+            JSON.parse(
+                storedData
+            );
+
+
+        if (
+            !Array.isArray(parsedData)
+        ) {
+
+            console.warn(
+                "النسخة المحلية من المناسبات غير صالحة."
+            );
+
+            return [];
+
+        }
+
+
+        // ----------------------------------------
+        // إعادة تطبيق التطبيع
+        // ----------------------------------------
+
+        const normalizedEvents =
+            parsedData
+                .map(
+                    normalizeSupabaseEvent
+                )
+                .filter(Boolean);
+
+
+        console.log(
+            `تم تحميل ${normalizedEvents.length} مناسبة من التخزين المحلي.`
+        );
+
+
+        return normalizedEvents;
+
+    }
+
+    catch (error) {
+
+        console.error(
+            "خطأ قراءة المناسبات من التخزين المحلي:",
+            error
+        );
+
+        return [];
+
+    }
+
+}
+
+
+// ============================================
 // تحميل المناسبات من Supabase
 // ============================================
 
@@ -184,13 +341,14 @@ async function loadSupabaseEvents() {
         !window.supabaseClient
     ) {
 
-        console.error(
-            "Supabase Client غير متوفر."
+        console.warn(
+            "Supabase Client غير متوفر، سيتم استخدام النسخة المحلية."
         );
 
-        return [];
+        return loadHijriEventsFromLocalStorage();
 
     }
+
 
     try {
 
@@ -201,7 +359,10 @@ async function loadSupabaseEvents() {
             await window.supabaseClient
                 .from("events")
                 .select("*")
-                .eq("is_active", true)
+                .eq(
+                    "is_active",
+                    true
+                )
                 .order(
                     "hijri_month",
                     {
@@ -215,40 +376,95 @@ async function loadSupabaseEvents() {
                     }
                 );
 
-        // ------------------------------------
+
+        // ----------------------------------------
         // معالجة خطأ Supabase
-        // ------------------------------------
+        // ----------------------------------------
 
-        if (error) {
+        if (
+            error
+        ) {
 
-            console.error(
-                "خطأ Supabase أثناء تحميل المناسبات:",
+            console.warn(
+                "تعذر تحميل المناسبات من Supabase:",
                 error
             );
 
-            return [];
+            console.log(
+                "سيتم استخدام آخر نسخة محلية."
+            );
+
+            return loadHijriEventsFromLocalStorage();
 
         }
 
-        // ------------------------------------
+
+        // ----------------------------------------
         // التأكد من البيانات
-        // ------------------------------------
+        // ----------------------------------------
 
         if (
             !Array.isArray(data)
         ) {
 
             console.warn(
-                "لم يتم العثور على مناسبات في Supabase."
+                "بيانات المناسبات القادمة من Supabase غير صالحة."
             );
 
-            return [];
+            return loadHijriEventsFromLocalStorage();
 
         }
+
+
+        // ----------------------------------------
+        // حماية من استبدال نسخة جيدة بقائمة فارغة
+        // ----------------------------------------
+
+        if (
+            data.length === 0
+        ) {
+
+            console.warn(
+                "Supabase أعاد 0 مناسبة، سيتم استخدام النسخة المحلية إن وجدت."
+            );
+
+            const localEvents =
+                loadHijriEventsFromLocalStorage();
+
+            if (
+                localEvents.length
+            ) {
+
+                return localEvents;
+
+            }
+
+        }
+
+
+        // ----------------------------------------
+        // نجاح التحميل
+        // ----------------------------------------
 
         console.log(
             `تم جلب ${data.length} مناسبة من Supabase.`
         );
+
+
+        // ----------------------------------------
+        // حفظ النسخة الناجحة محليًا
+        // ----------------------------------------
+
+        if (
+            data.length > 0
+        ) {
+
+            saveHijriEventsToLocalStorage(
+                data
+            );
+
+        }
+
 
         return data;
 
@@ -256,12 +472,12 @@ async function loadSupabaseEvents() {
 
     catch (error) {
 
-        console.error(
-            "خطأ أثناء الاتصال بـ Supabase:",
+        console.warn(
+            "تعذر الاتصال بـ Supabase، سيتم استخدام النسخة المحلية:",
             error
         );
 
-        return [];
+        return loadHijriEventsFromLocalStorage();
 
     }
 
@@ -279,6 +495,11 @@ async function loadImamEvents() {
         const events =
             await loadSupabaseEvents();
 
+
+        // ----------------------------------------
+        // التأكد من البيانات
+        // ----------------------------------------
+
         if (
             !Array.isArray(events)
         ) {
@@ -289,14 +510,23 @@ async function loadImamEvents() {
 
         }
 
+
+        // ----------------------------------------
+        // تحويل البيانات إلى الشكل الداخلي
+        // ----------------------------------------
+
         loadedHijriEvents =
             events
-                .map(normalizeSupabaseEvent)
+                .map(
+                    normalizeSupabaseEvent
+                )
                 .filter(Boolean);
 
+
         console.log(
-            `تم تحميل ${loadedHijriEvents.length} مناسبة هجرية من Supabase.`
+            `تم تحميل ${loadedHijriEvents.length} مناسبة هجرية.`
         );
+
 
         return loadedHijriEvents;
 
@@ -304,14 +534,21 @@ async function loadImamEvents() {
 
     catch (error) {
 
-        console.error(
+        console.warn(
             "خطأ تحميل المناسبات الهجرية:",
             error
         );
 
-        loadedHijriEvents = [];
 
-        return [];
+        // ----------------------------------------
+        // محاولة أخيرة من Local Storage
+        // ----------------------------------------
+
+        loadedHijriEvents =
+            loadHijriEventsFromLocalStorage();
+
+
+        return loadedHijriEvents;
 
     }
 
@@ -330,10 +567,12 @@ function getHijriEvents(
     const day =
         Number(hijriDay);
 
+
     const month =
         calendarHijriMonthToInternal(
             hijriMonth
         );
+
 
     if (
         !Number.isInteger(day) ||
@@ -344,6 +583,7 @@ function getHijriEvents(
         return [];
 
     }
+
 
     return loadedHijriEvents.filter(
         event =>
@@ -367,11 +607,14 @@ function attachHijriEvents(
     hijriMonth
 ) {
 
-    if (!dayElement) {
+    if (
+        !dayElement
+    ) {
 
         return;
 
     }
+
 
     const events =
         getHijriEvents(
@@ -379,31 +622,41 @@ function attachHijriEvents(
             hijriMonth
         );
 
-    if (!events.length) {
+
+    if (
+        !events.length
+    ) {
 
         return;
 
     }
 
+
     dayElement.classList.add(
         "has-event"
     );
 
+
     dayElement.dataset.events =
         JSON.stringify(events);
 
+
     const firstEvent =
         events[0];
+
 
     const color =
         firstEvent.color ||
         "#777777";
 
+
     dayElement.style.borderColor =
         color;
 
+
     dayElement.style.background =
         `${color}22`;
+
 
     // ----------------------------------------
     // منع إضافة المؤشر أكثر من مرة
@@ -419,16 +672,20 @@ function attachHijriEvents(
 
     }
 
+
     const dot =
         document.createElement(
             "span"
         );
 
+
     dot.className =
         "event-dot";
 
+
     dot.style.background =
         color;
+
 
     dayElement.appendChild(
         dot
@@ -452,12 +709,14 @@ function showHijriEvents(events) {
 
     }
 
+
     return events
         .map(event => {
 
             const color =
                 event.color ||
                 "#777777";
+
 
             const holiday =
                 event.is_holiday === true
@@ -468,6 +727,7 @@ function showHijriEvents(events) {
                       `
                     : "";
 
+
             const description =
                 event.description
                     ? `
@@ -476,6 +736,7 @@ function showHijriEvents(events) {
                         </p>
                       `
                     : "";
+
 
             return `
                 <div
@@ -524,6 +785,7 @@ function getInternalHijriMonthName(month) {
 
     ];
 
+
     return (
         months[Number(month)] ||
         ""
@@ -539,23 +801,47 @@ function getInternalHijriMonthName(month) {
 window.loadSupabaseEvents =
     loadSupabaseEvents;
 
+
 window.loadImamEvents =
     loadImamEvents;
+
 
 window.getHijriEvents =
     getHijriEvents;
 
+
 window.attachHijriEvents =
     attachHijriEvents;
+
 
 window.showHijriEvents =
     showHijriEvents;
 
+
 window.normalizeHijriMonth =
     normalizeHijriMonth;
+
 
 window.calendarHijriMonthToInternal =
     calendarHijriMonthToInternal;
 
+
 window.getInternalHijriMonthName =
     getInternalHijriMonthName;
+
+
+// ============================================
+// دوال Offline للاختبار والتشخيص
+// ============================================
+
+window.saveHijriEventsToLocalStorage =
+    saveHijriEventsToLocalStorage;
+
+
+window.loadHijriEventsFromLocalStorage =
+    loadHijriEventsFromLocalStorage;
+
+
+// ============================================
+// نهاية hijri-events.js
+// ============================================
