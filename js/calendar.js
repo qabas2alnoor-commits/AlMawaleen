@@ -62,32 +62,78 @@ const hijriCalendarCache = new Map();
 // ============================================
 
 document.addEventListener("DOMContentLoaded", async () => {
+
     try {
+
+        // ----------------------------------------
+        // تحميل إعداد تصحيح التاريخ الهجري
+        // مهم قبل رسم التقويم
+        // ----------------------------------------
+
         if (typeof loadHijriOffset === "function") {
             await loadHijriOffset();
         }
 
-        if (typeof loadImamEvents === "function") {
-            await loadImamEvents();
-        }
 
-        if (typeof loadSidebarEvents === "function") {
-            loadSidebarEvents();
-        }
+        // ----------------------------------------
+        // تحميل أحداث المستخدم
+        // لا تنتظر Supabase هنا
+        // ----------------------------------------
 
         if (typeof loadUserEvents === "function") {
             loadUserEvents();
         }
 
-        await renderCalendar();
+
+        // ----------------------------------------
+        // إعداد الواجهة الأساسية
+        // ----------------------------------------
 
         setupDarkMode();
         setupAboutApp();
         setupDetailsModal();
 
+
+        // ----------------------------------------
+        // تحميل المناسبات الإمامية أولاً
+        // مهم حتى تظهر المناسبات الجانبية
+        // من أول فتح للتطبيق
+        // ----------------------------------------
+
+        if (typeof loadImamEvents === "function") {
+
+            await loadImamEvents();
+
+        }
+
+
+        // ----------------------------------------
+        // رسم التقويم بعد اكتمال تحميل المناسبات
+        // ----------------------------------------
+
+        await renderCalendar();
+
+
+        // ----------------------------------------
+        // تحديث القائمة الجانبية مباشرة
+        // بعد اكتمال تحميل المناسبات ورسم التقويم
+        // ----------------------------------------
+
+        if (typeof loadSidebarEvents === "function") {
+
+            loadSidebarEvents();
+
+        }
+
     } catch (error) {
-        console.error("خطأ أثناء تشغيل التقويم:", error);
+
+        console.error(
+            "خطأ أثناء تشغيل التقويم:",
+            error
+        );
+
     }
+
 });
 
 // ============================================
