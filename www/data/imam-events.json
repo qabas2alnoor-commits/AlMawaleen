@@ -1,0 +1,287 @@
+[
+{
+"id": "new-hijre-year",
+"month": 0,
+"day": 1,
+"title": "بداية السنة الهجرية 1448",
+"type": "martyrdom",
+"importance": 5,
+"color": "#C62828"
+},
+{
+"id": "ashura",
+"month": 0,
+"day": 10,
+"title": "عاشوراء - استشهاد الإمام الحسين (ع)",
+"type": "death",
+"importance": 5,
+"color": "#C62828"
+},
+{
+"id": "zein",
+"month": 0,
+"day": 25,
+"title": "استشهاد الامام زين العابدين (ع)",
+"type": "death",
+"importance": 5,
+"color": "#C62828"
+},
+
+{
+"id": "imam-hssan",
+"month": 1,
+"day": 7,
+"title": "شهادة الامام الحسن بن علي(ع)",
+"type": "martyrdom",
+"importance": 4,
+"color": "#C62828"
+},
+{
+"id": "fortheenth",
+"month": 1,
+"day": 20,
+"title": "اربعينية الامام الحسين(ع)",
+"type": "martyrdom",
+"importance": 4,
+"color": "#C62828"
+},
+{
+"id": "imam-sajjad-martyr",
+"month": 1,
+"day": 25,
+"title": "استشهاد الإمام زين العابدين (ع)",
+"type": "martyrdom",
+"importance": 4,
+"color": "#C62828"
+},
+{
+"id": "prphetm",
+"month": 1,
+"day": 28,
+"title": "وفاة النبي الاعظم (ع)",
+"type": "martyrdom",
+"importance": 4,
+"color": "#C62828"
+},
+
+{
+"id": "imam-hussain-birth",
+"month": 3,
+"day": 3,
+"title": "ولادة الإمام الحسين (ع)",
+"type": "birth",
+"importance": 5,
+"color": "#2E7D32"
+},
+{
+"id": "imam-baqir-birth",
+"month": 2,
+"day": 1,
+"title": "ولادة الإمام محمد الباقر (ع)",
+"type": "birth",
+"importance": 4,
+"color": "#2E7D32"
+},
+{
+"id": "imam-sadiq-birth",
+"month": 3,
+"day": 17,
+"title": "ولادة الإمام جعفر الصادق (ع)",
+"type": "birth",
+"importance": 5,
+"color": "#2E7D32"
+},
+{
+"id": "imam-hadi-birth",
+"month": 2,
+"day": 15,
+"title": "ولادة الإمام علي الهادي (ع)",
+"type": "birth",
+"importance": 4,
+"color": "#2E7D32"
+},
+
+{
+"id": "imam-ali-birth",
+"month": 7,
+"day": 13,
+"title": "ولادة الإمام علي بن أبي طالب (ع)",
+"type": "birth",
+"importance": 5,
+"color": "#2E7D32"
+},
+{
+"id": "prophet-mabath",
+"month": 7,
+"day": 27,
+"title": "المبعث النبوي الشريف",
+"type": "birth",
+"importance": 5,
+"color": "#2E7D32"
+},
+{
+"id": "imam-kadhim-birth",
+"month": 7,
+"day": 7,
+"title": "ولادة الإمام موسى الكاظم (ع)",
+"type": "birth",
+"importance": 4,
+"color": "#2E7D32"
+},
+{
+"id": "imam-ridha-birth",
+"month": 11,
+"day": 11,
+"title": "ولادة الإمام علي الرضا (ع)",
+"type": "birth",
+"importance": 5,
+"color": "#2E7D32"
+},
+{
+"id": "imam-jawad-birth",
+"month": 10,
+"day": 10,
+"title": "ولادة الإمام محمد الجواد (ع)",
+"type": "birth",
+"importance": 4,
+"color": "#2E7D32"
+},
+
+{
+"id": "imam-ali-martyr",
+"month": 9,
+"day": 21,
+"title": "استشهاد الإمام علي (ع)",
+"type": "martyrdom",
+"importance": 5,
+"color": "#C62828"
+},
+{
+"id": "imam-hassan-martyr",
+"month": 2,
+"day": 7,
+"title": "استشهاد الإمام الحسن المجتبى (ع)",
+"type": "martyrdom",
+"importance": 5,
+"color": "#C62828"
+},
+{
+"id": "imam-baqir-martyr",
+"month": 7,
+"day": 7,
+"title": "استشهاد الإمام محمد الباقر (ع)",
+"type": "martyrdom",
+"importance": 4,
+"color": "#C62828"
+},
+{
+"id": "imam-sadiq-martyr",
+"month": 10,
+"day": 25,
+"title": "استشهاد الإمام جعفر الصادق (ع)",
+"type": "martyrdom",
+"importance": 5,
+"color": "#C62828"
+},
+{
+"id": "imam-kadhim-martyr",
+"month": 7,
+"day": 25,
+"title": "استشهاد الإمام موسى الكاظم (ع)",
+"type": "martyrdom",
+"importance": 5,
+"color": "#C62828"
+},
+{
+"id": "imam-ridha-martyr",
+"month": 2,
+"day": 29,
+"title": "استشهاد الإمام علي الرضا (ع)",
+"type": "martyrdom",
+"importance": 5,
+"color": "#C62828"
+},
+{
+"id": "imam-jawad-martyr",
+"month": 11,
+"day": 29,
+"title": "استشهاد الإمام محمد الجواد (ع)",
+"type": "martyrdom",
+"importance": 4,
+"color": "#C62828"
+},
+{
+"id": "imam-hadi-martyr",
+"month": 7,
+"day": 3,
+"title": "استشهاد الإمام علي الهادي (ع)",
+"type": "martyrdom",
+"importance": 4,
+"color": "#C62828"
+},
+{
+"id": "imam-askari-martyr",
+"month": 8,
+"day": 8,
+"title": "استشهاد الإمام الحسن العسكري (ع)",
+"type": "martyrdom",
+"importance": 5,
+"color": "#C62828"
+},
+
+{
+"id": "fatima-birth",
+"month": 6,
+"day": 20,
+"title": "ولادة السيدة فاطمة الزهراء (ع)",
+"type": "birth",
+"importance": 5,
+"color": "#2E7D32"
+},
+{
+"id": "fatima-martyr",
+"month": 3,
+"day": 3,
+"title": "استشهاد السيدة فاطمة الزهراء (ع)",
+"type": "martyrdom",
+"importance": 5,
+"color": "#C62828"
+},
+{
+"id": "imam-mahdi-birth",
+"month": 8,
+"day": 15,
+"title": "ولادة الإمام المهدي (عج)",
+"type": "birth",
+"importance": 5,
+"color": "#2E7D32"
+},
+
+{
+"id": "ghadir",
+"month": 11,
+"day": 18,
+"title": "عيد الغدير الأغر",
+"type": "other",
+"importance": 5,
+"color": "#1565C0"
+},
+{
+"id": "mubahala",
+"month": 11,
+"day": 24,
+"title": "يوم المباهلة",
+"type": "other",
+"importance": 4,
+"color": "#1565C0"
+},
+{
+"id": "arbaeen",
+"month": 2,
+"day": 20,
+"title": "زيارة الأربعين للإمام الحسين (ع)",
+"type": "other",
+"importance": 5,
+"color": "#1565C0"
+}
+]

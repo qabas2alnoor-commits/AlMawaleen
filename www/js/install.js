@@ -10,25 +10,6 @@ const installAppBtn =
 
 
 // ============================================
-// إخفاء زر التثبيت داخل تطبيق Android
-// ============================================
-
-const isAndroidApp =
-    window.Capacitor &&
-    window.Capacitor.isNativePlatform &&
-    window.Capacitor.isNativePlatform() &&
-    window.Capacitor.getPlatform &&
-    window.Capacitor.getPlatform() === "android";
-
-if (isAndroidApp && installAppBtn) {
-
-    installAppBtn.style.display =
-        "none";
-
-}
-
-
-// ============================================
 // استقبال طلب التثبيت من المتصفح
 // ============================================
 
@@ -202,4 +183,3 @@ window.showInstallInstructions =
 
 window.closeInstallInstructions =
     closeInstallInstructions;
-

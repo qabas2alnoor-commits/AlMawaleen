@@ -1,0 +1,93 @@
+[
+  {
+    "id": "hijri-new-year",
+    "month": 1,
+    "day": 1,
+    "title": "رأس السنة الهجرية",
+    "type": "general",
+    "importance": 3,
+    "color": "#607D8B"
+  },
+  {
+    "id": "arrival-karbala",
+    "month": 1,
+    "day": 2,
+    "title": "وصول الإمام الحسين (ع) إلى كربلاء",
+    "type": "general",
+    "importance": 3,
+    "color": "#607D8B"
+  },
+  {
+    "id": "tasua",
+    "month": 1,
+    "day": 9,
+    "title": "تاسوعاء",
+    "type": "ziyara",
+    "importance": 5,
+    "color": "#6A1B9A"
+  },
+  {
+    "id": "ashura",
+    "month": 1,
+    "day": 10,
+    "title": "عاشوراء - استشهاد الإمام الحسين (ع)",
+    "type": "martyrdom",
+    "importance": 5,
+    "color": "#C62828"
+  },
+  {
+    "id": "abbas-martyrdom",
+    "month": 1,
+    "day": 10,
+    "title": "استشهاد أبي الفضل العباس (ع)",
+    "type": "martyrdom",
+    "importance": 5,
+    "color": "#C62828"
+  },
+  {
+    "id": "ali-akbar-martyrdom",
+    "month": 1,
+    "day": 10,
+    "title": "استشهاد علي الأكبر (ع)",
+    "type": "martyrdom",
+    "importance": 4,
+    "color": "#C62828"
+  },
+  {
+    "id": "zain-alabdeen-martyrdom",
+    "month": 1,
+    "day": 25,
+    "title": "استشهاد الإمام زين العابدين (ع)",
+    "type": "martyrdom",
+    "importance": 4,
+    "color": "#C62828"
+  },
+
+  {
+    "id": "arbaeen",
+    "month": 2,
+    "day": 20,
+    "title": "الأربعين",
+    "type": "ziyara",
+    "importance": 5,
+    "color": "#6A1B9A"
+  },
+  {
+    "id": "prophet-martyrdom",
+    "month": 2,
+    "day": 28,
+    "title": "وفاة النبي محمد ﷺ",
+    "type": "martyrdom",
+    "importance": 5,
+    "color": "#C62828"
+  },
+  {
+    "id": "imam-hassan-martyrdom",
+    "month": 2,
+    "day": 28,
+    "title": "استشهاد الإمام الحسن المجتبى (ع)",
+    "type": "martyrdom",
+    "importance": 5,
+    "color": "#C62828"
+  }
+]
