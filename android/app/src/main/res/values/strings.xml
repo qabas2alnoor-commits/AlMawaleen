@@ -1,7 +1,7 @@
-<?xml version='1.0' encoding='utf-8'?>
+﻿<?xml version='1.0' encoding='utf-8'?>
 <resources>
-    <string name="app_name">Mawaqit AlMowaleen</string>
-    <string name="title_activity_main">Mawaqit AlMowaleen</string>
+    <string name="app_name">مواقيت الموالين</string>
+    <string name="title_activity_main">مواقيت الموالين</string>
     <string name="package_name">com.mawaqit.almowaleen</string>
     <string name="custom_url_scheme">com.mawaqit.almowaleen</string>
 </resources>
