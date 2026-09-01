@@ -101,7 +101,7 @@ document.addEventListener("DOMContentLoaded", () => {
 
             }
 
-        }, 3000);
+        }, 20000);
 
 
     // ============================================

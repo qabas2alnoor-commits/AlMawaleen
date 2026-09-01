@@ -241,10 +241,15 @@ document.addEventListener("DOMContentLoaded", () => {
     // ============================================
 
     introVideo.addEventListener(
-        "loadeddata",
-        startVideo
-    );
+    "loadeddata",
+    () => {
 
+        introVideo.style.visibility = "visible";
+
+        startVideo();
+
+    }
+);
 
     // ============================================
     // انتهاء الفيديو
